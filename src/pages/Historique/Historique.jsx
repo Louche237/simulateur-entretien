@@ -139,6 +139,24 @@ export default function Historique() {
     }
   };
 
+  const handleExport = () => {
+    const dataToExport = {
+      stats,
+      sessions: filteredSessions,
+      exportedAt: new Date().toISOString(),
+    };
+    
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `historique-entretien-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const statCards = [
     { label: "Sessions totales", value: String(stats.totalSessions), ic: "mic", color: "purple" },
     { label: "Score moyen", value: `${stats.scoreMoyen}%`, ic: "trend", color: "gray" },
@@ -159,7 +177,7 @@ export default function Historique() {
               <p>Consultez vos performances et suivez votre progression</p>
             </div>
             <div className={styles.topbarActions}>
-              <button className={styles.btnExport}>{ICONS.download} Exporter</button>
+              <button className={styles.btnExport} onClick={handleExport}>{ICONS.download} Exporter</button>
               <button className={styles.btnNew} onClick={() => navigate("/simulation")}>
                 {ICONS.play} Nouvelle session
               </button>

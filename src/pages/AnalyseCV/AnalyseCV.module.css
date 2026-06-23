@@ -84,9 +84,9 @@
 
 /* EXTRACTIONS */
 .extractCard { background: var(--purple-50); border: 1px solid var(--purple-200); border-radius: 10px; padding: 14px 16px; margin-top: 10px; }
-.extractCard h4 { font-size: 13px; font-weight: 700; color: var(--purple); margin-bottom: 8px; }
+.extractCard h4 { font-size: 13px; font-weight: 700; color: var(--blue-500); margin-bottom: 8px; }
 .extractNote { font-size: 12px; color: var(--gray-500); margin-top: 8px; display: flex; align-items: center; gap: 4px; }
-.extractingMsg { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--purple); }
+.extractingMsg { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--blue-500); }
 .insightsCard { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 14px 16px; margin-top: 10px; }
 .insightsRow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 .insightPill { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
@@ -95,10 +95,10 @@
 
 /* TAGS */
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.tag { padding: 4px 10px; background: var(--purple-50); color: var(--purple); border-radius: 20px; font-size: 12px; font-weight: 500; }
+.tag { padding: 4px 10px; background: var(--purple-50); color: var(--blue-500); border-radius: 20px; font-size: 12px; font-weight: 500; }
 .tagGreen { padding: 4px 10px; background: var(--green-50); color: #16a34a; border-radius: 20px; font-size: 12px; font-weight: 500; }
 .tagRed { padding: 4px 10px; background: var(--red-50); color: var(--red-500); border-radius: 20px; font-size: 12px; font-weight: 500; }
-.tagPurple { padding: 4px 10px; background: var(--purple-50); color: var(--purple); border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--purple-200); }
+.tagPurple { padding: 4px 10px; background: var(--purple-50); color: var(--blue-500); border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--purple-200); }
 .emptyNote { font-size: 13px; color: var(--gray-500); font-style: italic; }
 
 /* FOOTER BOUTON */
@@ -190,9 +190,9 @@
 .severityBadge.blocking { background: var(--red-500); }
 .severityBadge.important { background: var(--amber-500); }
 .severityBadge.critical { background: var(--red-500); }
-.severityBadge.high { background: var(--purple); }
+.severityBadge.high { background: var(--blue-500); }
 .gapDesc { font-size: 13px; color: var(--gray-700); margin-bottom: 6px; }
-.gapAction { font-size: 13px; color: var(--purple); display: flex; gap: 6px; align-items: flex-start; }
+.gapAction { font-size: 13px; color: var(--blue-500); display: flex; gap: 6px; align-items: flex-start; }
 
 /* RECO CARD */
 .recoCard { border-radius: 12px; padding: 16px; border: 1px solid; }
@@ -209,12 +209,12 @@
 /* ATS */
 .atsSection { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 18px; }
 .atsHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.atsTitle { font-size: 15px; font-weight: 700; color: var(--purple); display: flex; align-items: center; gap: 6px; }
+.atsTitle { font-size: 15px; font-weight: 700; color: var(--blue-500); display: flex; align-items: center; gap: 6px; }
 .atsScore { font-size: 12px; color: var(--gray-500); }
 .atsGroup { margin-bottom: 12px; }
 .atsGroupLabel { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
 .atsTagRow { display: flex; flex-wrap: wrap; gap: 6px; }
-.atsTag { padding: 4px 10px; background: var(--purple-50); color: var(--purple); border-radius: 20px; font-size: 12px; border: 1px solid var(--purple-200); }
+.atsTag { padding: 4px 10px; background: var(--purple-50); color: var(--blue-500); border-radius: 20px; font-size: 12px; border: 1px solid var(--purple-200); }
 .atsDensity { font-size: 13px; color: var(--gray-700); }
 .atsIssues { display: flex; flex-direction: column; gap: 4px; }
 .atsIssue { font-size: 13px; color: var(--gray-700); display: flex; gap: 6px; align-items: flex-start; }
@@ -238,14 +238,14 @@
 .ctaCard.dark .ctaIcon { background: var(--gray-100); }
 .ctaTitle { font-size: 16px; font-weight: 700; color: var(--gray-900); }
 .ctaDesc { font-size: 13px; color: var(--gray-600, #4b5563); line-height: 1.6; }
-.ctaBtn { width: 100%; height: 44px; border: none; border-radius: 10px; background: var(--grad); color: #fff; font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity .15s; }
+.ctaBtn { width: 100%; height: 44px; border: none; border-radius: 10px; background: var(--blue-500); color: #fff; font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity .15s; }
 .ctaBtn:hover { opacity: .88; }
 .ctaBtn.outline { background: var(--gray-900); }
 .ctaBtn.outline:hover { opacity: .85; }
 
 /* NOUVELLE ANALYSE */
 .newAnalyseBtn { display: flex; align-items: center; justify-content: center; margin: 0 auto; padding: 10px 24px; border: 1.5px solid var(--gray-200); border-radius: 10px; background: var(--white); font-family: var(--font); font-size: 14px; font-weight: 500; color: var(--gray-700); cursor: pointer; transition: all .15s; }
-.newAnalyseBtn:hover { border-color: var(--purple); color: var(--purple); }
+.newAnalyseBtn:hover { border-color: var(--blue-500); color: var(--blue-500); }
 
 /* ERREUR */
 .errorBanner {

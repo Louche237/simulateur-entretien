@@ -8,6 +8,7 @@ import AnalyseCV from "./pages/AnalyseCV/AnalyseCV";
 import CVBuilder from "./pages/CVBuilder/CVBuilder";
 import Entrainements from "./pages/Entrainements/Entrainements";
 import Entretien from "./pages/Entretien/Entretien";
+import Admin from "./pages/Admin/Admin";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/analyse-cv" element={<AnalyseCV />} />
           <Route path="/cv-builder" element={<CVBuilder />} />
           <Route path="/entrainements" element={<Entrainements />} />
+          <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>
     </BrowserRouter>

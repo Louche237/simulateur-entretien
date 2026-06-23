@@ -8,6 +8,7 @@ import DynamicSection from "./DynamicSection";
 import CvPreview from "./CvPreview";
 import { analyseCV } from "../../utils/cvAI";
 import { ICONS } from "../../utils/icons";
+import html2pdf from "html2pdf.js";
 
 const COLORS = ["#7c3aed", "#2563eb", "#16a34a", "#dc2626", "#ea580c", "#1e293b"];
 const TEMPLATES = ["Classique", "Minimal", "Moderne"];
@@ -186,12 +187,23 @@ export default function CVBuilder() {
     }
   };
 
-  // PDF export using html2pdf (simple placeholder)
+  // PDF export using html2pdf
   const generatePDF = () => {
-    import('html2pdf.js').then((html2pdf) => {
-      const element = document.querySelector(`.${styles.previewDoc}`);
-      if (element) html2pdf().from(element).save(`${form.nom || "cv"}.pdf`);
-    });
+    const element = document.querySelector(`.${styles.previewDoc}`);
+    if (!element) {
+      alert("Veuillez d'abord créer un CV pour pouvoir l'exporter.");
+      return;
+    }
+
+    const opt = {
+      margin: 10,
+      filename: `${form.nom || "cv"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+
+    html2pdf().set(opt).from(element).save();
   };
 
   return (

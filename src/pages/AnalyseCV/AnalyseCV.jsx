@@ -234,7 +234,7 @@ export default function AnalyseCV() {
                       : <div className={styles.fileCheck}>{ICONS.check} CV analysé</div>
                     }
                     <button className={styles.removeBtn}
-                      onClick={(e) => { e.stopPropagation(); setCv(null); setCvData(null); setAnalysis(null); setAdapted(null); }}>
+                      onClick={(e) => { e.stopPropagation(); setCv(null); setCvData(null); setAnalysis(null); }}>
                       {ICONS.trash} Supprimer
                     </button>
                   </div>

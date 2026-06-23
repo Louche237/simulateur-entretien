@@ -203,3 +203,29 @@
   border-radius: 8px;
   object-fit: contain;
 }
+
+/* WARMING UP MESSAGE */
+.warmingUp {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 30px 34px;
+  animation: fadeUp .22s ease;
+}
+
+.warmingUpText {
+  flex: 1;
+}
+
+.warmingUpText h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 4px;
+}
+
+.warmingUpText p {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin: 0;
+}

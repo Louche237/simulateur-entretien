@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { key: "cvBuilder", icon: "layout", path: "/cv-builder" },
   { key: "historique", icon: "history", path: "/historique" },
   { key: "abonnements", icon: "card" },
+  { key: "admin", icon: "settings", path: "/admin", adminOnly: true },
   { key: "parametres", icon: "settings", path: "/parametres" },
 ];
 
@@ -22,6 +23,7 @@ const LABELS = {
     cvBuilder: "CV Builder",
     historique: "Historique",
     abonnements: "Abonnements",
+    admin: "Admin",
     parametres: "Paramètres",
     profil: "Profil",
     deconnexion: "Déconnexion",
@@ -34,6 +36,7 @@ const LABELS = {
     cvBuilder: "CV Builder",
     historique: "History",
     abonnements: "Subscriptions",
+    admin: "Admin",
     parametres: "Settings",
     profil: "Profile",
     deconnexion: "Logout",
@@ -97,8 +100,12 @@ export default function Sidebar({ user }) {
       </div>
 
       <nav className={styles.nav}>
-        {NAV_ITEMS.map((item) =>
-          item.path ? (
+        {NAV_ITEMS.map((item) => {
+          if (item.adminOnly && currentUser?.role !== "admin") {
+            return null;
+          }
+          
+          return item.path ? (
             <Link
               key={item.key}
               to={item.path}
@@ -110,8 +117,8 @@ export default function Sidebar({ user }) {
             <div key={item.key} className={`${styles.navItem} ${styles.navDisabled}`}>
               {ICONS[item.icon]}{labels[item.key]}
             </div>
-          )
-        )}
+          );
+        })}
       </nav>
 
       <div className={styles.footer}>

@@ -234,3 +234,9 @@ export const cvAPI = {
     });
   },
 };
+
+// ── ADMIN ───────────────────────────────────────────────────────
+export const adminAPI = {
+  getStats: () => request("/admin/stats", { headers: headers() }),
+  getUsers: () => request("/admin/users", { headers: headers() }),
+};

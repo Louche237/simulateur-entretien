@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./AuthPage.module.css";
 import { authAPI } from "../../utils/api";
 
@@ -266,6 +266,25 @@ function RegisterForm({ onSwitch }) {
 
 export default function AuthPage() {
   const [tab, setTab] = useState("login");
+  const [warmingUp, setWarmingUp] = useState(true);
+
+  // Try to warm up the backend when the page loads
+  useEffect(() => {
+    const warmUpServer = async () => {
+      try {
+        await fetch(import.meta.env.VITE_API_URL + "/api/health", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (e) {
+        // Ignore errors, just trying to wake up the server
+      } finally {
+        setWarmingUp(false);
+      }
+    };
+
+    warmUpServer();
+  }, []);
 
   return (
     <div className={styles.page}>
@@ -292,15 +311,28 @@ export default function AuthPage() {
 
       <main className={styles.formZone}>
         <div className={styles.card}>
-          <div className={styles.toggle}>
-            <button className={`${styles.tab} ${tab === "login" ? styles.active : ""}`} onClick={() => setTab("login")}>Connexion</button>
-            <button className={`${styles.tab} ${tab === "register" ? styles.active : ""}`} onClick={() => setTab("register")}>Inscription</button>
-          </div>
-          <div className={styles.formBody}>
-            {tab === "login"
-              ? <LoginForm onSwitch={() => setTab("register")} />
-              : <RegisterForm onSwitch={() => setTab("login")} />}
-          </div>
+          {warmingUp && (
+            <div className={styles.warmingUp}>
+              <span className={styles.spinner} />
+              <div className={styles.warmingUpText}>
+                <h3>Réveil du serveur en cours…</h3>
+                <p>Veuillez patienter quelques secondes, le serveur démarre !</p>
+              </div>
+            </div>
+          )}
+          {!warmingUp && (
+            <>
+              <div className={styles.toggle}>
+                <button className={`${styles.tab} ${tab === "login" ? styles.active : ""}`} onClick={() => setTab("login")}>Connexion</button>
+                <button className={`${styles.tab} ${tab === "register" ? styles.active : ""}`} onClick={() => setTab("register")}>Inscription</button>
+              </div>
+              <div className={styles.formBody}>
+                {tab === "login"
+                  ? <LoginForm onSwitch={() => setTab("register")} />
+                  : <RegisterForm onSwitch={() => setTab("login")} />}
+              </div>
+            </>
+          )}
         </div>
         <p className={styles.legal}>
           En continuant, vous acceptez nos <a href="#">conditions d'utilisation</a> et notre <a href="#">politique de confidentialité</a>.

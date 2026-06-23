@@ -7,6 +7,7 @@ import healthRouter from "./routes/health.js";
 import sessionsRouter from "./routes/sessions.js";
 import simulationRouter from "./routes/simulation.js";
 import usersRouter from "./routes/users.js";
+import adminRouter from "./routes/admin.js";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/simulation", simulationRouter);
 app.use("/api/cv", cvRouter);
+app.use("/api/admin", adminRouter);
 
 app.use((req, res) => {
   res.status(404).json({

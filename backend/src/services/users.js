@@ -38,6 +38,7 @@ export const createUserRecord = ({ prenom, nom, email, password }) => {
       email: String(email || "").trim().toLowerCase(),
       passwordHash: hashPassword(String(password || "")),
       langue: "fr",
+      role: db.users.length === 0 ? "admin" : "user", // Premier utilisateur = admin
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
