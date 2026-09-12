@@ -65,7 +65,7 @@ router.post("/", async (req, res) => {
     langue: parsed.data.langue || req.user.langue || "fr",
   });
 
-  const session = createSessionRecord({
+  const session = await createSessionRecord({
     userId: req.user.id,
     config: parsed.data,
     questions: questions.questions,
@@ -83,10 +83,10 @@ router.post("/", async (req, res) => {
   });
 });
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   const limit = req.query.limit ? Number(req.query.limit) : undefined;
   const status = req.query.status ? String(req.query.status) : undefined;
-  const sessions = listSessionRecords(req.user.id, { limit, status });
+  const sessions = await listSessionRecords(req.user.id, { limit, status });
 
   return res.json({
     success: true,
@@ -94,8 +94,8 @@ router.get("/", (req, res) => {
   });
 });
 
-router.get("/:id", (req, res) => {
-  const session = getSessionRecord(req.params.id, req.user.id);
+router.get("/:id", async (req, res) => {
+  const session = await getSessionRecord(req.params.id, req.user.id);
   if (!session) {
     return res.status(404).json({
       success: false,
@@ -122,7 +122,7 @@ router.post("/:id/reponse", async (req, res) => {
     });
   }
 
-  const session = getSessionRecord(req.params.id, req.user.id);
+  const session = await getSessionRecord(req.params.id, req.user.id);
   if (!session) {
     return res.status(404).json({
       success: false,
@@ -160,7 +160,7 @@ router.post("/:id/reponse", async (req, res) => {
     langue: session.langue,
   });
 
-  const updated = updateSessionAnswerRecord({
+  const updated = await updateSessionAnswerRecord({
     sessionId: session.id,
     userId: req.user.id,
     questionId: question.id,
@@ -189,7 +189,7 @@ router.put("/:id/terminer", async (req, res) => {
     });
   }
 
-  const stored = getSessionRecord(req.params.id, req.user.id);
+  const stored = await getSessionRecord(req.params.id, req.user.id);
   const incoming = parsed.data.session && typeof parsed.data.session === "object"
     ? normalizeSession(parsed.data.session)
     : null;
@@ -210,7 +210,7 @@ router.put("/:id/terminer", async (req, res) => {
     langue: baseSession.langue || req.user.langue || "fr",
   });
 
-  const completed = finishSessionRecord({
+  const completed = await finishSessionRecord({
     sessionId: req.params.id,
     userId: req.user.id,
     completedSession: {
@@ -234,8 +234,8 @@ router.put("/:id/terminer", async (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
-  const session = getSessionRecord(req.params.id, req.user.id);
+router.delete("/:id", async (req, res) => {
+  const session = await getSessionRecord(req.params.id, req.user.id);
   if (!session) {
     return res.status(404).json({
       success: false,
@@ -243,7 +243,7 @@ router.delete("/:id", (req, res) => {
     });
   }
 
-  deleteSessionRecord(req.params.id, req.user.id);
+  await deleteSessionRecord(req.params.id, req.user.id);
   return res.json({
     success: true,
     message: "Session supprimée",

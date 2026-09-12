@@ -1,0 +1,556 @@
+/* ══════════════════════════════════════════════════════════════
+   ADMIN AUTHENTICATION - THEME DASHBOARD ADMIN
+   Harmonisation avec la console d'administration JobMentor
+   Palette : Slate 50 (#f8fafc), Indigo 600 (#4f46e5), Blue 600 (#2563eb)
+══════════════════════════════════════════════════════════════ */
+
+.adminAuthPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(1000px circle at 15% 15%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+    radial-gradient(800px circle at 85% 85%, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
+    radial-gradient(600px circle at 50% 50%, rgba(2, 132, 199, 0.03) 0%, transparent 60%);
+  color: #0f172a;
+  font-family: var(--font, "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  padding: 2rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Grille subtile en arrière-plan type console d'administration */
+.adminAuthPage::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(15, 23, 42, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+/* Aura lumineuse supérieure douce */
+.ambientGlow {
+  position: absolute;
+  width: 600px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, rgba(59, 130, 246, 0.04) 50%, transparent 70%);
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+/* Carte centrale d'authentification */
+.authCard {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 2.25rem 2.25rem 2rem;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.03),
+    0 20px 45px -15px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(226, 232, 240, 0.8);
+  box-sizing: border-box;
+  animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Version légèrement plus large pour le formulaire d'inscription (multi-colonnes) */
+.authCardWide {
+  max-width: 520px;
+}
+
+/* Liseré supérieur décoratif dégradé admin */
+.cardTopBorder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4f46e5 0%, #3b82f6 50%, #06b6d4 100%);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── HEADER DE LA CARTE ── */
+.badgeHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.logoContainer {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+  margin-bottom: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.logoContainer:hover {
+  transform: scale(1.04);
+}
+
+.logoImg {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.headerBadges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.6rem;
+}
+
+.adminBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.title {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #0f172a;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.25;
+}
+
+.subtitle {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+/* ── ALERTES D'ERREUR & DE SUCCÈS ── */
+.errorAlert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 0.75rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  line-height: 1.4;
+  animation: shake 0.3s ease-in-out;
+}
+
+.errorIcon {
+  color: #ef4444;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.successAlert {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  padding: 0.75rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  line-height: 1.4;
+}
+
+.successIcon {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* ── FORMULAIRES ET INPUTS ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.labelHint {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px 0 39px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  color: #0f172a;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.inputWithAction {
+  padding-right: 42px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.inputWrapper:focus-within .inputIcon {
+  color: #4f46e5;
+}
+
+.input::placeholder {
+  color: #94a3b8;
+  font-size: 0.86rem;
+}
+
+.passwordToggleBtn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 7px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.passwordToggleBtn:hover {
+  color: #1e293b;
+  background: #e2e8f0;
+}
+
+/* Champ spécifique de la clé de sécurité admin */
+.securityKeyWrapper .input {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.securityKeyWrapper .inputIcon {
+  color: #d97706;
+}
+
+.securityKeyWrapper .input:focus {
+  border-color: #d97706;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.14);
+}
+
+.securityKeyWrapper:focus-within .inputIcon {
+  color: #b45309;
+}
+
+/* ── VALIDATION DU MOT DE PASSE (INSCRIPTION) ── */
+.passwordChecklist {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.1rem;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.76rem;
+  color: #64748b;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.checkItemValid {
+  color: #059669;
+  font-weight: 600;
+}
+
+.checkBullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: all 0.15s ease;
+}
+
+.checkItemValid .checkBullet {
+  background: #10b981;
+  box-shadow: 0 0 4px #10b981;
+}
+
+/* ── BOUTON PRINCIPAL ── */
+.submitBtn {
+  margin-top: 0.4rem;
+  height: 46px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: -0.01em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+  width: 100%;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4338ca 0%, #2563eb 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ── LIENS ET NAVIGATION PIED DE CARTE ── */
+.footerActions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: center;
+  font-size: 0.84rem;
+  color: #64748b;
+}
+
+.switchLink {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.switchLink:hover {
+  color: #3730a3;
+  text-decoration: underline;
+}
+
+.backHomeContainer {
+  margin-top: 0.25rem;
+  display: flex;
+  justify-content: center;
+}
+
+.backHomeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.15s ease;
+}
+
+.backHomeLink:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Bandeau de sécurité inférieur */
+.securityFooterNotice {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* ── SPINNER ── */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── RESPONSIVE MOBILE ── */
+@media (max-width: 640px) {
+  .adminAuthPage {
+    padding: 1rem 0.85rem;
+  }
+
+  .authCard {
+    padding: 1.75rem 1.25rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  .title {
+    font-size: 1.35rem;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .headerBadges {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

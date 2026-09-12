@@ -77,7 +77,7 @@ const getScopedKey = (baseKey) => {
         return `${baseKey}_${userIdent}`;
       }
     }
-  } catch (e) {
+  } catch {
     // ignore
   }
   return baseKey;

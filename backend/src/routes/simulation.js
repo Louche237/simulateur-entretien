@@ -2,7 +2,7 @@ import express from "express";
 import { z } from "zod";
 import { DEFAULT_QUESTION_BANK } from "../constants.js";
 import { buildInterviewSessionQuestions } from "../services/interview.js";
-import { readDb, updateDb } from "../store.js";
+import { QuestionBank } from "../models/index.js";
 
 const router = express.Router();
 
@@ -45,11 +45,21 @@ router.get("/questions", async (req, res) => {
   );
 
   if (!hasContext) {
-    const db = readDb();
-    return res.json({
-      success: true,
-      questions: db.questionBank || DEFAULT_QUESTION_BANK,
-    });
+    try {
+      const dbQuestions = await QuestionBank.findAll({
+        where: { isActive: true },
+        order: [["category", "ASC"], ["createdAt", "ASC"]],
+      });
+      return res.json({
+        success: true,
+        questions: dbQuestions.length ? dbQuestions : DEFAULT_QUESTION_BANK,
+      });
+    } catch {
+      return res.json({
+        success: true,
+        questions: DEFAULT_QUESTION_BANK,
+      });
+    }
   }
 
   const skills = Array.isArray(parsed.data.skills)
@@ -70,16 +80,28 @@ router.get("/questions", async (req, res) => {
   });
 });
 
-router.post("/seed", (req, res) => {
-  updateDb((db) => {
-    db.questionBank = DEFAULT_QUESTION_BANK;
-    return db;
-  });
+router.post("/seed", async (req, res) => {
+  try {
+    await QuestionBank.destroy({ where: {} });
+    for (const q of DEFAULT_QUESTION_BANK) {
+      await QuestionBank.create({
+        id: q.id,
+        category: q.category || "general",
+        text: q.text,
+        isActive: true,
+      });
+    }
 
-  return res.json({
-    success: true,
-    count: DEFAULT_QUESTION_BANK.length,
-  });
+    return res.json({
+      success: true,
+      count: DEFAULT_QUESTION_BANK.length,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erreur lors du seeding des questions : " + error.message,
+    });
+  }
 });
 
 export default router;

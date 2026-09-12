@@ -312,7 +312,7 @@ function ClassiqueSection({ title, color, children }) {
   );
 }
 
-function MinimalSection({ title, color, children }) {
+function MinimalSection({ title, children }) {
   return (
     <div>
       <h4 style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>

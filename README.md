@@ -31,27 +31,41 @@ npm run dev
 
 ## Variables d'environnement backend
 
-Le backend peut fonctionner sans clé OpenAI, mais il bascule alors sur des heuristiques locales.
+Le backend utilise désormais une véritable base de données relationnelle **MySQL** avec **Sequelize ORM** :
+
+- `DB_HOST` : Hôte MySQL (`127.0.0.1` par défaut)
+- `DB_PORT` : Port MySQL (`3306` par défaut)
+- `DB_NAME` : Nom de la base (`jobmentor_db` par défaut, auto-créée si absente)
+- `DB_USER` : Utilisateur MySQL (`root` par défaut)
+- `DB_PASSWORD` : Mot de passe MySQL
+- `ADMIN_INVITE_CODE` : Clé d'invitation secrète pour inscription administrateur (`ADMIN2026` par défaut)
+
+Commandes de base de données disponibles dans `backend/` :
+```bash
+# Initialiser et synchroniser la base MySQL + seeder les données
+npm run db:init
+```
 
 - `PORT` `5000` par défaut
 - `CLIENT_ORIGIN` `http://localhost:5173` par défaut
 - `JWT_SECRET` clé de signature des tokens
-- `OPENAI_API_KEY` clé OpenAI
-- `OPENAI_MODEL` `gpt-5.5` par défaut
+- `OPENAI_API_KEY` clé OpenAI ou Groq
 
-Un fichier d'exemple est disponible dans [`backend/.env.example`](./backend/.env.example).
+## Interface Administrateur Dédiée
 
-## API disponible
+L'espace administrateur dispose d'une URL et d'écrans dédiés distincts de l'espace candidat :
 
-- Authentification: `/api/auth/inscription`, `/api/auth/connexion`
-- Profil utilisateur: `/api/users/profil`, `/api/users/password`, `/api/users/stats`, `/api/users/compte`
-- Sessions d'entretien: `/api/sessions`
-- Génération de questions: `/api/simulation/questions`
-- Analyse CV: `/api/cv/extract`, `/api/cv/analyze-file`, `/api/cv/analyze`
-- Santé serveur: `/api/health`
+- **Connexion Administrateur** : `http://localhost:5173/admin/login`
+- **Inscription Administrateur** (avec clé secrète) : `http://localhost:5173/admin/register`
+- **Dashboard Administrateur** : `http://localhost:5173/admin`
+  - 📊 **Vue d'ensemble** : Métriques globales, KPIs et top candidats
+  - 👥 **Gestion des Utilisateurs** : Création, modification, changement de rôle, réinitialisation de mot de passe et suppression
+  - 🎯 **Sessions d'entretien** : Consultation des transcriptions de réponses des candidats, feedbacks IA et suppression
+  - 💡 **Banque de questions** : Ajout, modification, suppression et réinitialisation de questions par catégorie
+  - 🗄️ **Base de données MySQL** : Statut Sequelize en direct, nombre de lignes, boutons de synchronisation et maintenance
 
-## Notes
+Compte administrateur par défaut :
+- Email : `admin@jobmentor.fr`
+- Mot de passe : `Admin2026!`
+- Code d'inscription secret : `ADMIN2026`
 
-- Les sessions créées depuis le front sont d'abord gérées en local puis synchronisées avec l'API.
-- L'analyse CV accepte les fichiers PDF, DOC et DOCX.
-- Si `OPENAI_API_KEY` n'est pas défini, le backend garde un comportement fonctionnel grâce aux fallbacks locaux.

@@ -4,7 +4,6 @@ import styles from "./AnalyseCV.module.css";
 import {
   fakeExtractCV,
   scoreCVAgainstOffer,
-  generateAdaptedCV,
   getOfferInsights,
 } from "../../utils/cvLocal";
 import { cvAPI } from "../../utils/api";
@@ -83,13 +82,13 @@ export default function AnalyseCV() {
   /* Simulation barre de progression — nettoyée et sans boucle infinie */
   useEffect(() => {
     if (!loading) {
-      setProgress(0);
-      return;
+      const t = setTimeout(() => setProgress(0), 0);
+      return () => clearTimeout(t);
     }
 
-    setProgress(10);
-    const steps = [30, 55, 70, 85, 92];
     const timers = [];
+    timers.push(setTimeout(() => setProgress(10), 0));
+    const steps = [30, 55, 70, 85, 92];
 
     steps.forEach((p, i) => {
       const timer = setTimeout(() => setProgress(p), (i + 1) * 900);

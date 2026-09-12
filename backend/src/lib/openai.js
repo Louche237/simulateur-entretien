@@ -40,7 +40,7 @@ function getSchemaFormat(schema) {
     return [elem];
   }
   
-  let descStr = "";
+  let descStr;
   if (typeName === "ZodEnum") {
     descStr = `enum (${schema._def.values?.join(" | ") || ""})`;
   } else if (typeName === "ZodString") {

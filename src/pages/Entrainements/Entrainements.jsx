@@ -242,7 +242,7 @@ const COMPETENCES = [
   { id: "leader", emoji: "🚀", label: "Leadership & influence", sub: "Mobiliser, décider, embarquer,...", q: 4 },
   { id: "tech", emoji: "🧩", label: "Technique métier", sub: "Vulgariser et démontrer sa...", q: 6 },
 ];
-const JOURS = ["L","M","M","J","V","S","D"];
+
 const TRAINING_PROFILE_KEY = "jobmentor.trainingProfile";
 const TRAINING_MODAL_KEY = "jobmentor.trainingModalSeen";
 
@@ -256,7 +256,9 @@ const getScopedKey = (baseKey) => {
         return `${baseKey}_${userIdent}`;
       }
     }
-  } catch (e) {}
+  } catch {
+    // ignore
+  }
   return baseKey;
 };
 
@@ -409,7 +411,7 @@ function SetupWizard({ onFinish }) {
       {/* ÉTAPE 2 — OBJECTIF */}
       {step === 2 && (
         <div className={styles.wizardStep}>
-          <div className={styles.wizardEmoji}>🚀</div>
+          <div className={styles.wizardEmoji}></div>
           <h2>Ton objectif principal ?</h2>
           <p>Pour personnaliser tes scénarios.</p>
           <div className={styles.objectifList}>
@@ -488,7 +490,7 @@ function SetupWizard({ onFinish }) {
           </div>
           <div className={styles.field}>
             <label>Fourchette salariale visée <span className={styles.optional}>(optionnel)</span></label>
-            <input className={styles.input} placeholder="Ex: 45-55k€ brut annuel"
+            <input className={styles.input} placeholder="Ex: 45-55k fcfa brut annuel"
               value={salaire} onChange={(e) => setSalaire(e.target.value)} />
             <p className={styles.hint}>Sert à générer des questions de négociation salariale réalistes.</p>
           </div>
@@ -541,7 +543,7 @@ function EntrainementsDashboard({ profile, onReset }) {
   
   const navigate = useNavigate();
 
-  const competencesProgress = useMemo(() => getAllCompetencesProgress(), [sessions]);
+  const competencesProgress = getAllCompetencesProgress();
 
   const MODAL_SLIDES = [
     {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import styles from "./CVBuilder.module.css";
 import { ICONS } from "../../utils/icons";
 

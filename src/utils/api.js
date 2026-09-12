@@ -104,6 +104,13 @@ export const authAPI = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     }),
+
+  confirmerEmail: (token) =>
+    request("/auth/confirmer-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    }),
 };
 
 // ── USER ─────────────────────────────────────────────────────
@@ -235,8 +242,101 @@ export const cvAPI = {
   },
 };
 
+// ── ADMIN AUTH ──────────────────────────────────────────────────
+export const adminAuthAPI = {
+  login: (data) =>
+    request("/admin/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }),
+
+  register: (data) =>
+    request("/admin/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }),
+};
+
 // ── ADMIN ───────────────────────────────────────────────────────
 export const adminAPI = {
+  // Stats
   getStats: () => request("/admin/stats", { headers: headers() }),
+
+  // Users
   getUsers: () => request("/admin/users", { headers: headers() }),
+  getUser: (id) => request(`/admin/users/${id}`, { headers: headers() }),
+  createUser: (data) =>
+    request("/admin/users", {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify(data),
+    }),
+  updateUser: (id, data) =>
+    request(`/admin/users/${id}`, {
+      method: "PUT",
+      headers: headers(),
+      body: JSON.stringify(data),
+    }),
+  resetUserPassword: (id, newPassword) =>
+    request(`/admin/users/${id}/password`, {
+      method: "PUT",
+      headers: headers(),
+      body: JSON.stringify({ newPassword }),
+    }),
+  deleteUser: (id) =>
+    request(`/admin/users/${id}`, {
+      method: "DELETE",
+      headers: headers(),
+    }),
+
+  // Sessions
+  getSessions: (params = "") =>
+    request(`/admin/sessions${params}`, { headers: headers() }),
+  getSession: (id) =>
+    request(`/admin/sessions/${id}`, { headers: headers() }),
+  deleteSession: (id) =>
+    request(`/admin/sessions/${id}`, {
+      method: "DELETE",
+      headers: headers(),
+    }),
+
+  // Questions Bank
+  getQuestions: () => request("/admin/questions", { headers: headers() }),
+  createQuestion: (data) =>
+    request("/admin/questions", {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify(data),
+    }),
+  updateQuestion: (id, data) =>
+    request(`/admin/questions/${id}`, {
+      method: "PUT",
+      headers: headers(),
+      body: JSON.stringify(data),
+    }),
+  deleteQuestion: (id) =>
+    request(`/admin/questions/${id}`, {
+      method: "DELETE",
+      headers: headers(),
+    }),
+  resetQuestions: () =>
+    request("/admin/questions/reset", {
+      method: "POST",
+      headers: headers(),
+    }),
+
+  // Database & System
+  getDbStatus: () => request("/admin/db/status", { headers: headers() }),
+  syncDb: () =>
+    request("/admin/db/sync", {
+      method: "POST",
+      headers: headers(),
+    }),
+  initDb: () =>
+    request("/admin/db/init", {
+      method: "POST",
+      headers: headers(),
+    }),
 };

@@ -1,7 +1,7 @@
 import { verifyToken } from "../lib/auth.js";
 import { getUserRecordById, toPublicUser } from "../services/users.js";
 
-export const requireAuth = (req, res, next) => {
+export const requireAuth = async (req, res, next) => {
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
 
@@ -14,7 +14,7 @@ export const requireAuth = (req, res, next) => {
 
   try {
     const decoded = verifyToken(token);
-    const user = getUserRecordById(decoded.sub);
+    const user = await getUserRecordById(decoded.sub);
 
     if (!user) {
       return res.status(401).json({

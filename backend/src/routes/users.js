@@ -32,7 +32,7 @@ router.get("/profil", (req, res) => {
   });
 });
 
-router.put("/profil", (req, res) => {
+router.put("/profil", async (req, res) => {
   const parsed = profileSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({
@@ -45,7 +45,7 @@ router.put("/profil", (req, res) => {
     });
   }
 
-  const updated = updateUserRecord(req.user.id, parsed.data);
+  const updated = await updateUserRecord(req.user.id, parsed.data);
   if (!updated) {
     return res.status(404).json({
       success: false,
@@ -59,7 +59,7 @@ router.put("/profil", (req, res) => {
   });
 });
 
-router.put("/password", (req, res) => {
+router.put("/password", async (req, res) => {
   const parsed = passwordSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({
@@ -72,7 +72,7 @@ router.put("/password", (req, res) => {
     });
   }
 
-  const result = updatePasswordRecord(
+  const result = await updatePasswordRecord(
     req.user.id,
     parsed.data.currentPassword,
     parsed.data.newPassword
@@ -91,15 +91,16 @@ router.put("/password", (req, res) => {
   });
 });
 
-router.get("/stats", (req, res) => {
+router.get("/stats", async (req, res) => {
+  const stats = await computeUserStats(req.user.id);
   return res.json({
     success: true,
-    stats: computeUserStats(req.user.id),
+    stats,
   });
 });
 
-router.delete("/compte", (req, res) => {
-  deleteUserRecord(req.user.id);
+router.delete("/compte", async (req, res) => {
+  await deleteUserRecord(req.user.id);
   return res.json({
     success: true,
     message: "Compte supprimé",

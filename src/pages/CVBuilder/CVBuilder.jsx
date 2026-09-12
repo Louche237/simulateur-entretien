@@ -120,7 +120,7 @@ export default function CVBuilder() {
     if (offre.length < 50) return;
     setLoading(true);
     setAdaptation(null);
-    const source = cvData || { skills: [], summary: form.resume, experiences, education, skills, languages, certifications, projects, interests };
+    const source = cvData || { summary: form.resume, experiences, education, skills, languages, certifications, projects, interests };
     // Call AI analysis utility (could be backend)
     const result = await analyseCV(source, offre);
     if (result && result.adapted) {

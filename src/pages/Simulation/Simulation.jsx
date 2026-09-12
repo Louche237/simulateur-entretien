@@ -25,16 +25,16 @@ const ICONS = {
 };
 
 const RECRUTEURS = [
-  { id: "aria", name: "Aria", desc: "Bienveillante, rassurante et professionnelle.", emoji: "✨" },
-  { id: "guillaume", name: "Guillaume", desc: "Directif, structuré et orienté résultats.", emoji: "⚡" },
-  { id: "sophie", name: "Sophie", desc: "Analytique, curieuse et axée sur les détails.", emoji: "🔍" },
-  { id: "thomas", name: "Thomas", desc: "Décontracté, humain et à l'écoute.", emoji: "😊" },
+  { id: "aria", name: "Aria", desc: "Bienveillante, rassurante et professionnelle.", emoji: "" },
+  { id: "guillaume", name: "Guillaume", desc: "Directif, structuré et orienté résultats.", emoji: "" },
+  { id: "sophie", name: "Sophie", desc: "Analytique, curieuse et axée sur les détails.", emoji: "" },
+  { id: "thomas", name: "Thomas", desc: "Décontracté, humain et à l'écoute.", emoji: "" },
 ];
 
 const MODELES = [
   {
     categorie: "Tech & Développement",
-    emoji: "💻",
+    emoji: "",
     items: [
       {
         id: "dev-web",
@@ -111,7 +111,7 @@ Profil :
   },
   {
     categorie: "Produit & Design",
-    emoji: "🎨",
+    emoji: "",
     items: [
       {
         id: "product-manager",
@@ -152,7 +152,7 @@ Profil :
   },
   {
     categorie: "Business & Commercial",
-    emoji: "📈",
+    emoji: "",
     items: [
       {
         id: "commercial",
@@ -194,7 +194,7 @@ Profil :
   },
   {
     categorie: "Finance & Conseil",
-    emoji: "💼",
+    emoji: "",
     items: [
       {
         id: "consultant",
@@ -235,7 +235,7 @@ Profil :
   },
   {
     categorie: "RH & Management",
-    emoji: "🤝",
+    emoji: "",
     items: [
       {
         id: "rh",
@@ -426,7 +426,7 @@ export default function Simulation() {
                 />
                 {poste && <span className={styles.inputCheck}>{ICONS.check}</span>}
               </div>
-              <p className={styles.hint}>💡 Vous pouvez saisir n'importe quel poste</p>
+              <p className={styles.hint}>Vous pouvez saisir n'importe quel poste</p>
 
               <div className={styles.orDivider}><span>OU</span></div>
 
@@ -456,10 +456,10 @@ export default function Simulation() {
               <label className={styles.sectionLabel}>Type d'entretien</label>
               <div className={styles.choiceGrid2}>
                 {[
-                  { id: "rh", label: "Entretien RH", sub: "Aisance relationnelle, parcours et motivation", emoji: "🤝" },
-                  { id: "technique", label: "Entretien technique", sub: "Compétences dures, algorithmes et outils", emoji: "💻" },
-                  { id: "comportemental", label: "Entretien comportemental", sub: "Soft skills, gestion des conflits et stress", emoji: "🧠" },
-                  { id: "direction", label: "Entretien direction", sub: "Vision stratégique, leadership et fit culturel", emoji: "👑" },
+                  { id: "rh", label: "Entretien RH", sub: "Aisance relationnelle, parcours et motivation", emoji: "" },
+                  { id: "technique", label: "Entretien technique", sub: "Compétences dures, algorithmes et outils", emoji: "" },
+                  { id: "comportemental", label: "Entretien comportemental", sub: "Soft skills, gestion des conflits et stress", emoji: "" },
+                  { id: "direction", label: "Entretien direction", sub: "Vision stratégique, leadership et fit culturel", emoji: "" },
                 ].map((t) => (
                   <div
                     key={t.id}
@@ -481,7 +481,7 @@ export default function Simulation() {
                 {[
                   { id: "debutant", label: "Débutant", sub: "0-2 ans d'expérience", emoji: "✨" },
                   { id: "intermediaire", label: "Intermédiaire", sub: "3-5 ans d'expérience", emoji: "⚡" },
-                  { id: "avance", label: "Avancé", sub: "5+ ans d'expérience", emoji: "🎯" },
+                  { id: "avance", label: "Avancé", sub: "5+ ans d'expérience", emoji: "" },
                 ].map((n) => (
                   <div
                     key={n.id}
@@ -542,7 +542,7 @@ export default function Simulation() {
             <div className={styles.section}>
               <div className={styles.toggleCard}>
                 <div>
-                  <div className={styles.toggleTitle}>Questions surprises 🎲</div>
+                  <div className={styles.toggleTitle}>Questions surprises </div>
                   <div className={styles.toggleDesc}>Ajoute des questions inattendues pour tester votre spontanéité et votre capacité d'improvisation.</div>
                 </div>
                 <div
@@ -652,7 +652,7 @@ export default function Simulation() {
           <div className={styles.modalBox} ref={modalRef}>
             <div className={styles.modalHeader}>
               <div>
-                <h2 className={styles.modalTitle}>📋 Choisir un modèle de poste</h2>
+                <h2 className={styles.modalTitle}> Choisir un modèle de poste</h2>
                 <p className={styles.modalSubtitle}>Sélectionnez un modèle pour pré-remplir le poste et la description.</p>
               </div>
               <button className={styles.modalClose} onClick={() => setShowModeles(false)} aria-label="Fermer">✕</button>

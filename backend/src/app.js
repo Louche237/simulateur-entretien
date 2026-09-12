@@ -8,6 +8,7 @@ import sessionsRouter from "./routes/sessions.js";
 import simulationRouter from "./routes/simulation.js";
 import usersRouter from "./routes/users.js";
 import adminRouter from "./routes/admin.js";
+import adminAuthRouter from "./routes/adminAuth.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use("/api/health", healthRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/admin/auth", adminAuthRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/simulation", simulationRouter);

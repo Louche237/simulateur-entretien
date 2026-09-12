@@ -87,7 +87,9 @@ export default function Sidebar({ user }) {
           localStorage.removeItem(`jobmentor.activeSessionId_${userIdent}`);
         }
       }
-    } catch (e) {}
+    } catch {
+      // ignore
+    }
     localStorage.clear();
     window.location.href = "/";
   };

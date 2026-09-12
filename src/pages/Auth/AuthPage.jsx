@@ -276,7 +276,7 @@ export default function AuthPage() {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
-      } catch (e) {
+      } catch {
         // Ignore errors, just trying to wake up the server
       } finally {
         setWarmingUp(false);

@@ -1,111 +1,126 @@
+import crypto from "node:crypto";
 import { comparePassword, hashPassword } from "../lib/auth.js";
 import { initialsFromUser, makeId } from "../lib/text.js";
-import { readDb, updateDb } from "../store.js";
+import { User, Session } from "../models/index.js";
 
-export const toPublicUser = (user) => {
-  if (!user) return null;
+export const toPublicUser = (rawUser) => {
+  if (!rawUser) return null;
 
-  const publicUser = { ...user };
-  delete publicUser.passwordHash;
+  const user = typeof rawUser.get === "function" ? rawUser.get({ plain: true }) : { ...rawUser };
+  delete user.passwordHash;
+  delete user.confirmationToken;
+
   return {
-    ...publicUser,
-    initiales: publicUser.initiales || initialsFromUser(publicUser),
+    ...user,
+    initiales: user.initiales || initialsFromUser(user),
   };
 };
 
-export const getUserRecordByEmail = (email) => {
-  const db = readDb();
-  return (
-    db.users.find(
-      (user) => user.email.toLowerCase() === String(email).toLowerCase()
-    ) || null
-  );
+export const getUserRecordByEmail = async (email) => {
+  if (!email) return null;
+  return await User.findOne({
+    where: { email: String(email).trim().toLowerCase() },
+  });
 };
 
-export const getUserRecordById = (userId) => {
-  const db = readDb();
-  return db.users.find((user) => user.id === userId) || null;
+export const getUserRecordById = async (userId) => {
+  if (!userId) return null;
+  return await User.findByPk(userId);
 };
 
-export const createUserRecord = ({ prenom, nom, email, password }) => {
-  let created = null;
+export const listAllUsers = async () => {
+  return await User.findAll({
+    order: [["createdAt", "DESC"]],
+  });
+};
 
-  updateDb((db) => {
-    const user = {
-      id: makeId("usr"),
-      prenom: String(prenom || "").trim(),
-      nom: String(nom || "").trim(),
-      email: String(email || "").trim().toLowerCase(),
-      passwordHash: hashPassword(String(password || "")),
-      langue: "fr",
-      role: db.users.length === 0 ? "admin" : "user", // Premier utilisateur = admin
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+export const createUserRecord = async ({ prenom, nom, email, password, role }) => {
+  const confirmationToken = crypto.randomBytes(32).toString("hex");
+  const confirmationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    db.users.unshift(user);
-    created = user;
-    return db;
+  const totalUsers = await User.count();
+  const assignedRole = role || (totalUsers === 0 ? "admin" : "user");
+
+  const created = await User.create({
+    id: makeId("usr"),
+    prenom: String(prenom || "").trim(),
+    nom: String(nom || "").trim(),
+    email: String(email || "").trim().toLowerCase(),
+    passwordHash: hashPassword(String(password || "")),
+    langue: "fr",
+    role: assignedRole,
+    emailConfirmed: assignedRole === "admin", // auto-confirm admin
+    confirmationToken,
+    confirmationTokenExpiresAt,
+    onboardingCompleted: false,
   });
 
   return created;
 };
 
-export const updateUserRecord = (userId, patch = {}) => {
-  let updated = null;
+export const confirmUserEmail = async (token) => {
+  if (!token) return null;
+  const user = await User.findOne({ where: { confirmationToken: token } });
+  if (!user) return null;
 
-  updateDb((db) => {
-    const user = db.users.find((entry) => entry.id === userId);
-    if (!user) return db;
+  const now = new Date();
+  if (user.confirmationTokenExpiresAt && now > new Date(user.confirmationTokenExpiresAt)) {
+    return null;
+  }
 
-    if (patch.prenom !== undefined) {
-      user.prenom = String(patch.prenom || "").trim();
-    }
-
-    if (patch.nom !== undefined) {
-      user.nom = String(patch.nom || "").trim();
-    }
-
-    if (patch.langue !== undefined) {
-      user.langue = String(patch.langue || "fr").trim() || "fr";
-    }
-
-    if (patch.email !== undefined) {
-      user.email = String(patch.email || "").trim().toLowerCase();
-    }
-
-    user.updatedAt = new Date().toISOString();
-    updated = user;
-    return db;
+  await user.update({
+    emailConfirmed: true,
+    confirmationToken: null,
+    confirmationTokenExpiresAt: null,
   });
 
-  return updated;
+  return user;
 };
 
-export const updatePasswordRecord = (userId, currentPassword, newPassword) => {
-  const db = readDb();
-  const user = db.users.find((entry) => entry.id === userId);
+export const markOnboardingCompleted = async (userId) => {
+  const user = await User.findByPk(userId);
+  if (!user) return null;
+
+  await user.update({ onboardingCompleted: true });
+  return user;
+};
+
+export const updateUserRecord = async (userId, patch = {}) => {
+  const user = await User.findByPk(userId);
+  if (!user) return null;
+
+  const updates = {};
+  if (patch.prenom !== undefined) updates.prenom = String(patch.prenom).trim();
+  if (patch.nom !== undefined) updates.nom = String(patch.nom).trim();
+  if (patch.langue !== undefined) updates.langue = String(patch.langue).trim() || "fr";
+  if (patch.email !== undefined) updates.email = String(patch.email).trim().toLowerCase();
+  if (patch.role !== undefined && ["user", "admin"].includes(patch.role)) updates.role = patch.role;
+  if (patch.emailConfirmed !== undefined) updates.emailConfirmed = Boolean(patch.emailConfirmed);
+  if (patch.password) updates.passwordHash = hashPassword(String(patch.password));
+
+  await user.update(updates);
+  return user;
+};
+
+export const updatePasswordRecord = async (userId, currentPassword, newPassword) => {
+  const user = await User.findByPk(userId);
   if (!user) return { ok: false, message: "Utilisateur introuvable" };
 
   if (!comparePassword(currentPassword, user.passwordHash)) {
     return { ok: false, message: "Mot de passe actuel incorrect" };
   }
 
-  updateDb((draft) => {
-    const draftUser = draft.users.find((entry) => entry.id === userId);
-    if (!draftUser) return draft;
-    draftUser.passwordHash = hashPassword(newPassword);
-    draftUser.updatedAt = new Date().toISOString();
-    return draft;
+  await user.update({
+    passwordHash: hashPassword(newPassword),
   });
 
   return { ok: true };
 };
 
-export const deleteUserRecord = (userId) => {
-  updateDb((db) => {
-    db.users = db.users.filter((user) => user.id !== userId);
-    db.sessions = db.sessions.filter((session) => session.userId !== userId);
-    return db;
-  });
+export const deleteUserRecord = async (userId) => {
+  const user = await User.findByPk(userId);
+  if (!user) return false;
+
+  await user.destroy();
+  return true;
 };

@@ -1,12 +1,14 @@
-import { readDb } from "../store.js";
 import { safeNumber } from "../lib/text.js";
+import { Session } from "../models/index.js";
 
-export const computeUserStats = (userId) => {
-  const db = readDb();
-  const sessions = db.sessions.filter((session) => session.userId === userId);
+export const computeUserStats = async (userId) => {
+  const sessions = await Session.findAll({
+    where: { userId },
+  });
+
   const finished = sessions.filter((session) => session.status === "terminee");
-
   const totalSessions = finished.length;
+
   const scoreMoyen = totalSessions
     ? Math.round(
         finished.reduce((sum, session) => sum + safeNumber(session.score, 0), 0) /
