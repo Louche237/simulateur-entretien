@@ -9,12 +9,18 @@ export default function ConfirmEmail() {
   const token = searchParams.get("token");
   const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState("");
+  const [alreadyConfirmed, setAlreadyConfirmed] = useState(false);
+
+  // Formulaire de réexpédition en cas d'erreur
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMsg, setResendMsg] = useState({ type: "", text: "" });
 
   useEffect(() => {
     const confirm = async () => {
       if (!token) {
         setStatus("error");
-        setMessage("Token de confirmation manquant");
+        setMessage("Lien de confirmation manquant ou invalide.");
         return;
       }
 
@@ -22,22 +28,49 @@ export default function ConfirmEmail() {
         const res = await authAPI.confirmerEmail(token);
         if (res.success) {
           setStatus("success");
-          setMessage(res.message || "Votre email a été confirmé avec succès !");
+          setMessage(res.message || "Votre adresse e-mail a été confirmée avec succès !");
+          setAlreadyConfirmed(Boolean(res.alreadyConfirmed));
+
+          if (res.token) {
+            localStorage.setItem("token", res.token);
+          }
           if (res.user) {
             localStorage.setItem("user", JSON.stringify(res.user));
           }
         } else {
           setStatus("error");
-          setMessage(res.message || "Une erreur est survenue");
+          setMessage(res.message || "Ce lien de confirmation est invalide ou a expiré.");
+          if (res.email) setResendEmail(res.email);
         }
       } catch {
         setStatus("error");
-        setMessage("Impossible de confirmer votre email. Veuillez réessayer.");
+        setMessage("Impossible de confirmer votre e-mail pour le moment. Veuillez réessayer.");
       }
     };
 
     confirm();
   }, [token]);
+
+  const handleResend = async (e) => {
+    e.preventDefault();
+    if (!resendEmail || !resendEmail.includes("@") || resendLoading) return;
+
+    setResendLoading(true);
+    setResendMsg({ type: "", text: "" });
+
+    try {
+      const res = await authAPI.renvoyerConfirmation(resendEmail);
+      setResendLoading(false);
+      if (res.success) {
+        setResendMsg({ type: "success", text: res.message || "Un nouvel e-mail vous a été envoyé !" });
+      } else {
+        setResendMsg({ type: "error", text: res.message || "Erreur lors du renvoi." });
+      }
+    } catch {
+      setResendLoading(false);
+      setResendMsg({ type: "error", text: "Erreur de connexion au serveur." });
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -50,28 +83,61 @@ export default function ConfirmEmail() {
               <p>Nous vérifions votre lien de confirmation.</p>
             </>
           )}
+
           {status === "success" && (
             <>
               <div className={styles.iconSuccess}>✓</div>
-              <h1>Email confirmé ! 🎉</h1>
+              <h1>{alreadyConfirmed ? "Déjà confirmé ! 🎉" : "E-mail confirmé ! 🎉"}</h1>
               <p>{message}</p>
             </>
           )}
+
           {status === "error" && (
             <>
               <div className={styles.iconError}>!</div>
-              <h1>Oups…</h1>
+              <h1>Lien invalide ou expiré</h1>
               <p>{message}</p>
               <p className={styles.subError}>
-                Le lien est peut-être expiré ou invalide. Vous pouvez demander un nouveau lien depuis votre espace.
+                Les liens de confirmation expirent au bout de 24 heures pour des raisons de sécurité.
               </p>
+
+              <form onSubmit={handleResend} className={styles.resendBox}>
+                <label htmlFor="resend-email" className={styles.resendBoxLabel}>
+                  Recevoir un nouveau lien de confirmation :
+                </label>
+                <div className={styles.resendRow}>
+                  <input
+                    id="resend-email"
+                    type="email"
+                    placeholder="votre-email@exemple.com"
+                    value={resendEmail}
+                    onChange={(e) => setResendEmail(e.target.value)}
+                    className={styles.resendInput}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={resendLoading}
+                    className={styles.resendActionBtn}
+                  >
+                    {resendLoading ? "Envoi..." : "Renvoyer"}
+                  </button>
+                </div>
+
+                {resendMsg.type === "success" && (
+                  <div className={styles.resendMsgSuccess}>✓ {resendMsg.text}</div>
+                )}
+                {resendMsg.type === "error" && (
+                  <div className={styles.resendMsgError}>⚠ {resendMsg.text}</div>
+                )}
+              </form>
             </>
           )}
         </div>
 
         <div className={styles.actions}>
           <button className={styles.primaryBtn} onClick={() => navigate("/dashboard")}>
-            {status === "success" ? "Accéder à mon espace" : "Retour à l'accueil"}
+            {status === "success" ? "Accéder à mon espace →" : "Retour à l'accueil"}
           </button>
           {status !== "success" && (
             <button className={styles.secondaryBtn} onClick={() => navigate("/")}>

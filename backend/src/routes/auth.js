@@ -7,10 +7,12 @@ import {
   confirmUserEmail,
   createUserRecord,
   getUserRecordByEmail,
+  regenerateConfirmationToken,
   toPublicUser,
 } from "../services/users.js";
 
 const router = express.Router();
+const resendCooldown = new Map();
 
 const registerSchema = z.object({
   prenom: z.string().trim().min(1, "Prénom requis"),
@@ -56,25 +58,23 @@ router.post("/inscription", async (req, res) => {
     ? (req.headers.origin || "http://localhost:5173")
     : config.clientOrigin;
 
-  await sendConfirmationEmail({
-    prenom: created.prenom,
-    nom: created.nom,
-    email: created.email,
-    confirmationToken: created.confirmationToken,
-    clientOrigin,
-  });
+  const confirmationToken = created.confirmationToken;
 
-  await sendWelcomeEmail({
+  // Envoi automatique de l'e-mail de confirmation
+  const emailResult = await sendConfirmationEmail({
     prenom: created.prenom,
     nom: created.nom,
     email: created.email,
+    confirmationToken,
+    clientOrigin,
   });
 
   return res.status(201).json({
     success: true,
     token,
     user,
-    message: "Un email de confirmation vous a été envoyé",
+    emailSent: Boolean(emailResult?.success),
+    message: "Inscription réussie ! Un e-mail de confirmation vous a été envoyé.",
   });
 });
 
@@ -87,18 +87,109 @@ router.post("/confirmer-email", async (req, res) => {
     });
   }
 
-  const confirmed = await confirmUserEmail(token);
-  if (!confirmed) {
+  const result = await confirmUserEmail(token);
+
+  if (result.status === "invalid" || result.status === "not_found") {
     return res.status(400).json({
       success: false,
-      message: "Token invalide ou expiré",
+      status: "not_found",
+      message: "Ce lien de confirmation est invalide ou a déjà été utilisé.",
     });
   }
 
+  if (result.status === "already_confirmed") {
+    const user = result.user;
+    return res.json({
+      success: true,
+      alreadyConfirmed: true,
+      message: "Votre adresse e-mail est déjà confirmée !",
+      token: signToken(user),
+      user: toPublicUser(user),
+    });
+  }
+
+  if (result.status === "expired") {
+    return res.status(400).json({
+      success: false,
+      status: "expired",
+      message: "Ce lien de confirmation a expiré (validité 24h). Veuillez demander un nouveau lien.",
+      email: result.user?.email,
+    });
+  }
+
+  const user = result.user;
+
+  // Expédier l'e-mail de bienvenue après confirmation effective
+  sendWelcomeEmail({
+    prenom: user.prenom,
+    nom: user.nom,
+    email: user.email,
+  }).catch((err) => console.error("[EMAIL] Erreur bienvenue :", err.message));
+
   return res.json({
     success: true,
-    message: "Email confirmé avec succès",
-    user: toPublicUser(confirmed),
+    message: "Email confirmé avec succès ! Votre compte est pleinement activé.",
+    token: signToken(user),
+    user: toPublicUser(user),
+  });
+});
+
+router.post("/renvoyer-confirmation", async (req, res) => {
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  if (!email || !email.includes("@")) {
+    return res.status(400).json({
+      success: false,
+      message: "Adresse e-mail valide requise",
+    });
+  }
+
+  // Cooldown de 60 secondes pour éviter le spam
+  const now = Date.now();
+  const lastSent = resendCooldown.get(email);
+  if (lastSent && now - lastSent < 60000) {
+    const remainingSec = Math.ceil((60000 - (now - lastSent)) / 1000);
+    return res.status(429).json({
+      success: false,
+      message: `Veuillez patienter ${remainingSec}s avant de renvoyer un nouvel e-mail.`,
+      remainingSec,
+    });
+  }
+
+  const result = await regenerateConfirmationToken(email);
+
+  if (result.status === "not_found") {
+    return res.json({
+      success: true,
+      message: "Si un compte non confirmé existe pour cet e-mail, un nouveau lien a été envoyé.",
+    });
+  }
+
+  if (result.status === "already_confirmed") {
+    return res.json({
+      success: true,
+      alreadyConfirmed: true,
+      message: "Votre adresse e-mail est déjà confirmée. Vous pouvez vous connecter directement.",
+    });
+  }
+
+  const clientOrigin = config.clientOrigin === "*"
+    ? (req.headers.origin || "http://localhost:5173")
+    : config.clientOrigin;
+
+  const emailResult = await sendConfirmationEmail({
+    prenom: result.user.prenom,
+    nom: result.user.nom,
+    email: result.user.email,
+    confirmationToken: result.confirmationToken,
+    clientOrigin,
+  });
+
+  resendCooldown.set(email, now);
+
+  return res.json({
+    success: true,
+    emailSent: Boolean(emailResult?.success),
+    message: "Un nouvel e-mail de confirmation vous a été envoyé.",
   });
 });
 

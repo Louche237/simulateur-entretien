@@ -132,6 +132,19 @@ function RegisterForm({ onSwitch }) {
   const [showPwd, setShowPwd] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState("");
+  const [resendError, setResendError] = useState("");
+  const [countdown, setCountdown] = useState(0);
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => {
+      setCountdown((c) => c - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const change = (e) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
@@ -159,9 +172,10 @@ function RegisterForm({ onSwitch }) {
     setLoading(false);
     if (data.success) {
       localStorage.clear();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      window.location.href = "/dashboard";
+      if (data.token) localStorage.setItem("token", data.token);
+      if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+      setRegisteredEmail(form.email);
+      setCountdown(60);
       return;
     }
 
@@ -183,6 +197,89 @@ function RegisterForm({ onSwitch }) {
 
     setErrors({ email: data.message });
   };
+
+  const handleResend = async () => {
+    if (countdown > 0 || resendLoading || !registeredEmail) return;
+    setResendLoading(true);
+    setResendSuccess("");
+    setResendError("");
+
+    try {
+      const res = await authAPI.renvoyerConfirmation(registeredEmail);
+      setResendLoading(false);
+      if (res.success) {
+        setResendSuccess(res.message || "Un nouvel e-mail de confirmation vous a été envoyé !");
+        setCountdown(60);
+      } else {
+        setResendError(res.message || "Impossible de renvoyer l'e-mail pour le moment.");
+      }
+    } catch {
+      setResendLoading(false);
+      setResendError("Une erreur est survenue lors de la réexpédition.");
+    }
+  };
+
+  if (registeredEmail) {
+    return (
+      <div className={styles.verifyCard}>
+        <div className={styles.verifyIconWrapper}>
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+        </div>
+
+        <h2 className={styles.verifyTitle}>Vérifiez votre boîte mail</h2>
+        <p className={styles.verifySub}>
+          Un e-mail contenant votre lien de confirmation a été envoyé à :
+        </p>
+
+        <div className={styles.emailBadge}>{registeredEmail}</div>
+
+        <p className={styles.verifyHint}>
+          Cliquez sur le lien dans l'e-mail pour activer votre compte. Vérifiez également vos courriers indésirables (spams) si nécessaire.
+        </p>
+
+        {resendSuccess && (
+          <div className={styles.resendAlertSuccess}>
+            ✓ {resendSuccess}
+          </div>
+        )}
+
+        {resendError && (
+          <div className={styles.resendAlertError}>
+            ⚠ {resendError}
+          </div>
+        )}
+
+        <div className={styles.verifyActions}>
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={() => { window.location.href = "/dashboard"; }}
+          >
+            Accéder à mon espace →
+          </button>
+
+          <button
+            type="button"
+            className={styles.resendBtn}
+            onClick={handleResend}
+            disabled={countdown > 0 || resendLoading}
+          >
+            {resendLoading ? "Envoi en cours..." : countdown > 0 ? `Renvoyer l'e-mail (${countdown}s)` : "Renvoyer l'e-mail de confirmation"}
+          </button>
+        </div>
+
+        <p className={styles.switchP}>
+          Mauvaise adresse ?{" "}
+          <button type="button" className={styles.swLnk} onClick={() => setRegisteredEmail("")}>
+            Modifier mes informations
+          </button>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form className={styles.form} onSubmit={submit} noValidate>

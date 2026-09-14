@@ -1,5 +1,44 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Target,
+  CalendarDays,
+  RefreshCw,
+  CalendarCheck,
+  Mic,
+  Laptop,
+  Landmark,
+  Briefcase,
+  ShoppingBag,
+  HeartPulse,
+  Factory,
+  Clapperboard,
+  Building2,
+  Sparkles,
+  Flame,
+  Coins,
+  TrendingDown,
+  TrendingUp,
+  Brain,
+  Scale,
+  Rocket,
+  Cpu,
+  Check,
+  Zap,
+  BookOpen,
+  X,
+  Star,
+  Dumbbell,
+  Clock,
+  Play,
+  ArrowRight,
+  ArrowLeft,
+  HelpCircle,
+  Compass,
+  RotateCcw,
+  BarChart3,
+  Lock,
+} from "lucide-react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import {
   createLocalSession,
@@ -64,7 +103,9 @@ function EvolutionChart({ sessions }) {
   return (
     <div className={styles.chartContainer}>
       <div className={styles.chartTitle}>
-        <span>📊 Progression sur les 30 derniers jours</span>
+        <span className={styles.chartTitleLabel}>
+          <BarChart3 size={16} className={styles.chartTitleIcon} /> Progression sur les 30 derniers jours
+        </span>
         {globalAvg > 0 && <span className={styles.globalAvgBadge}>Moyenne globale : {globalAvg}%</span>}
       </div>
       
@@ -193,8 +234,8 @@ function EvolutionChart({ sessions }) {
 
 const ICONS = {
   grid: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>,
-  mic: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>,
-  dumbbell: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M2 8h4M18 8h4M2 16h4M18 16h4M6 12h12"/></svg>,
+  mic: <Mic size={16} />,
+  dumbbell: <Dumbbell size={16} />,
   file: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
   layout: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>,
   history: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
@@ -202,45 +243,57 @@ const ICONS = {
   settings: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>,
   user: <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
   logout: <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
-  play: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>,
-  spark: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>,
-  flame: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2c0 0-6 6-6 12a6 6 0 0 0 12 0c0-6-6-12-6-12z"/></svg>,
-  lock: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
-  clock: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-  x: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-  arrow: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
-  arrowL: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+  play: <Play size={14} fill="currentColor" stroke="none" />,
+  spark: <Sparkles size={14} />,
+  flame: <Flame size={14} />,
+  lock: <Lock size={14} />,
+  clock: <Clock size={14} />,
+  x: <X size={14} />,
+  arrow: <ArrowRight size={14} />,
+  arrowL: <ArrowLeft size={14} />,
 };
+
+const renderStars = (starsCount, max = 5) => (
+  <span className={styles.starsRow}>
+    {Array.from({ length: max }).map((_, i) => (
+      <Star
+        key={i}
+        size={12}
+        className={i < starsCount ? styles.starFilled : styles.starEmpty}
+      />
+    ))}
+  </span>
+);
 
 const SUGGESTIONS_POSTES = ["Product Manager","Chef de projet","Développeur Full-Stack","Data Analyst","Consultant","Business Developer","UX/UI Designer","Marketing Manager"];
 const OBJECTIFS = [
-  { id: "job", emoji: "🎯", label: "Décrocher mon premier job", sub: "Premier vrai poste" },
-  { id: "prep", emoji: "📅", label: "Préparer mes futurs entretiens", sub: "Plusieurs entretiens à venir" },
-  { id: "reconv", emoji: "🔄", label: "Me reconvertir", sub: "Changer de métier ou secteur" },
-  { id: "precis", emoji: "📆", label: "Préparer un entretien précis", sub: "Échéance imminente" },
-  { id: "oral", emoji: "🎤", label: "Progresser en aisance orale", sub: "Être plus à l'aise" },
+  { id: "job", icon: <Target size={20} />, label: "Décrocher mon premier job", sub: "Premier vrai poste" },
+  { id: "prep", icon: <CalendarDays size={20} />, label: "Préparer mes futurs entretiens", sub: "Plusieurs entretiens à venir" },
+  { id: "reconv", icon: <RefreshCw size={20} />, label: "Me reconvertir", sub: "Changer de métier ou secteur" },
+  { id: "precis", icon: <CalendarCheck size={20} />, label: "Préparer un entretien précis", sub: "Échéance imminente" },
+  { id: "oral", icon: <Mic size={20} />, label: "Progresser en aisance orale", sub: "Être plus à l'aise" },
 ];
 const SECTEURS = [
-  { id: "tech", emoji: "💻", label: "Tech / SaaS" },
-  { id: "finance", emoji: "🏦", label: "Finance / Banque" },
-  { id: "conseil", emoji: "💼", label: "Conseil" },
-  { id: "retail", emoji: "🎁", label: "Retail / E-commerce" },
-  { id: "sante", emoji: "🏥", label: "Santé / Pharma" },
-  { id: "industrie", emoji: "🏭", label: "Industrie" },
-  { id: "media", emoji: "🎬", label: "Média / Pub" },
-  { id: "public", emoji: "🏛️", label: "Public / ONG" },
+  { id: "tech", icon: <Laptop size={17} />, label: "Tech / SaaS" },
+  { id: "finance", icon: <Landmark size={17} />, label: "Finance / Banque" },
+  { id: "conseil", icon: <Briefcase size={17} />, label: "Conseil" },
+  { id: "retail", icon: <ShoppingBag size={17} />, label: "Retail / E-commerce" },
+  { id: "sante", icon: <HeartPulse size={17} />, label: "Santé / Pharma" },
+  { id: "industrie", icon: <Factory size={17} />, label: "Industrie" },
+  { id: "media", icon: <Clapperboard size={17} />, label: "Média / Pub" },
+  { id: "public", icon: <Building2 size={17} />, label: "Public / ONG" },
 ];
 const SUGGESTIONS_SKILLS = ["Leadership","Communication","Négociation","Gestion de projet","Esprit d'analyse","Créativité","Travail en équipe","Gestion du stress","Anglais","Prise de parole"];
 const COMPETENCES = [
-  { id: "pitch", emoji: "🎤", label: "Pitch perso", sub: "Se présenter en 60-90s, parcou...", q: 4 },
-  { id: "star", emoji: "🎬", label: "Storytelling STAR", sub: "Raconter une expérience avec la...", q: 5 },
-  { id: "motiv", emoji: "🔥", label: "Motivation & sens", sub: "Pourquoi ce poste, cette...", q: 4 },
-  { id: "nego", emoji: "💰", label: "Négociation salaire", sub: "Salaire, package, contre-offre,...", q: 5 },
-  { id: "echec", emoji: "📉", label: "Parler d'un échec", sub: "Vrai échec passé et leçon apprise", q: 4 },
-  { id: "stress", emoji: "😰", label: "Gestion du stress", sub: "Questions pièges, faiblesses,...", q: 4 },
-  { id: "conflit", emoji: "⚔️", label: "Gestion de conflit", sub: "Conflit interpersonnel (collègue,...", q: 4 },
-  { id: "leader", emoji: "🚀", label: "Leadership & influence", sub: "Mobiliser, décider, embarquer,...", q: 4 },
-  { id: "tech", emoji: "🧩", label: "Technique métier", sub: "Vulgariser et démontrer sa...", q: 6 },
+  { id: "pitch", icon: <Mic size={18} />, label: "Pitch perso", sub: "Se présenter en 60-90s, parcou...", q: 4 },
+  { id: "star", icon: <Sparkles size={18} />, label: "Storytelling STAR", sub: "Raconter une expérience avec la...", q: 5 },
+  { id: "motiv", icon: <Flame size={18} />, label: "Motivation & sens", sub: "Pourquoi ce poste, cette...", q: 4 },
+  { id: "nego", icon: <Coins size={18} />, label: "Négociation salaire", sub: "Salaire, package, contre-offre,...", q: 5 },
+  { id: "echec", icon: <TrendingDown size={18} />, label: "Parler d'un échec", sub: "Vrai échec passé et leçon apprise", q: 4 },
+  { id: "stress", icon: <Brain size={18} />, label: "Gestion du stress", sub: "Questions pièges, faiblesses,...", q: 4 },
+  { id: "conflit", icon: <Scale size={18} />, label: "Gestion de conflit", sub: "Conflit interpersonnel (collègue,...", q: 4 },
+  { id: "leader", icon: <Rocket size={18} />, label: "Leadership & influence", sub: "Mobiliser, décider, embarquer,...", q: 4 },
+  { id: "tech", icon: <Cpu size={18} />, label: "Technique métier", sub: "Vulgariser et démontrer sa...", q: 6 },
 ];
 
 const TRAINING_PROFILE_KEY = "jobmentor.trainingProfile";
@@ -340,14 +393,14 @@ function SetupWizard({ onFinish }) {
   if (generating) {
     return (
       <div className={styles.genScreen}>
-        <div className={styles.genIcon}>✨</div>
+        <div className={styles.genIcon}><Sparkles size={40} /></div>
         <h2>Création de ta bibliothèque...</h2>
         <p>~15 secondes. On génère ~36 questions personnalisées à ton profil.</p>
         <div className={styles.genSteps}>
           {GEN_STEPS.map((s, i) => (
             <div key={i} className={`${styles.genStep} ${i === genStep ? styles.genStepActive : ""} ${i < genStep ? styles.genStepDone : ""}`}>
               <div className={styles.genStepIc}>
-                {i < genStep ? "✓" : i === genStep ? <span className={styles.genSpinner}/> : "○"}
+                {i < genStep ? <Check size={14} strokeWidth={2.5} /> : i === genStep ? <span className={styles.genSpinner}/> : <span className={styles.genStepBullet} />}
               </div>
               <div>
                 <div className={styles.genStepLabel}>{s.label}</div>
@@ -376,7 +429,7 @@ function SetupWizard({ onFinish }) {
       {/* ÉTAPE 1 — POSTES */}
       {step === 1 && (
         <div className={styles.wizardStep}>
-          <div className={styles.wizardEmoji}>🎯</div>
+          <div className={styles.wizardEmoji}><Target size={32} /></div>
           <h2>Quels postes vises-tu ?</h2>
           <p>Ajoute jusqu'à 5 intitulés. Tape Entrée pour valider.</p>
           <div className={styles.tagInput}>
@@ -411,7 +464,7 @@ function SetupWizard({ onFinish }) {
       {/* ÉTAPE 2 — OBJECTIF */}
       {step === 2 && (
         <div className={styles.wizardStep}>
-          <div className={styles.wizardEmoji}></div>
+          <div className={styles.wizardEmoji}><Compass size={32} /></div>
           <h2>Ton objectif principal ?</h2>
           <p>Pour personnaliser tes scénarios.</p>
           <div className={styles.objectifList}>
@@ -419,7 +472,7 @@ function SetupWizard({ onFinish }) {
               <div key={o.id}
                 className={`${styles.objectifItem} ${objectif === o.id ? styles.objectifActive : ""}`}
                 onClick={() => { setObjectif(o.id); setTimeout(() => setStep(3), 300); }}>
-                <span className={styles.objectifEmoji}>{o.emoji}</span>
+                <span className={styles.objectifEmoji}>{o.icon}</span>
                 <div>
                   <div className={styles.objectifLabel}>{o.label}</div>
                   <div className={styles.objectifSub}>{o.sub}</div>
@@ -437,7 +490,7 @@ function SetupWizard({ onFinish }) {
       {/* ÉTAPE 3 — SECTEUR */}
       {step === 3 && (
         <div className={styles.wizardStep}>
-          <div className={styles.wizardEmoji}>🏢</div>
+          <div className={styles.wizardEmoji}><Building2 size={32} /></div>
           <h2>Dans quel secteur ?</h2>
           <p>On colore tes mises en situation.</p>
           <div className={styles.secteurGrid}>
@@ -445,7 +498,7 @@ function SetupWizard({ onFinish }) {
               <div key={s.id}
                 className={`${styles.secteurItem} ${secteur === s.id ? styles.secteurActive : ""}`}
                 onClick={() => setSecteur(s.id)}>
-                <span>{s.emoji}</span> {s.label}
+                <span className={styles.secteurIcon}>{s.icon}</span> {s.label}
               </div>
             ))}
           </div>
@@ -468,7 +521,7 @@ function SetupWizard({ onFinish }) {
       {/* ÉTAPE 4 — COMPÉTENCES */}
       {step === 4 && (
         <div className={styles.wizardStep}>
-          <div className={styles.wizardEmoji}>💪</div>
+          <div className={styles.wizardEmoji}><Zap size={32} /></div>
           <h2>Tes compétences clés</h2>
           <p>Celles que tu veux mettre en avant. 2 à 8.</p>
           <div className={styles.tagInput}>
@@ -547,12 +600,12 @@ function EntrainementsDashboard({ profile, onReset }) {
 
   const MODAL_SLIDES = [
     {
-      icon: "⚡",
+      icon: <Zap size={28} strokeWidth={2} />,
       title: "Ton entraînement du jour, en 10 minutes",
       text: "Chaque jour, ton coach IA te prépare 4 questions ciblées : révisions de tes points faibles + nouveautés. Tu réponds à l'oral, l'IA te score et te montre la version modèle. C'est ton vrai cardio d'entretien.",
     },
     {
-      icon: "📈",
+      icon: <TrendingUp size={28} strokeWidth={2} />,
       title: "Suis ta progression",
       text: "Ton radar de compétences se met à jour après chaque session. Tu vois exactement où tu progresses et ce qu'il reste à travailler.",
     },
@@ -621,7 +674,7 @@ function EntrainementsDashboard({ profile, onReset }) {
       {showModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
-            <button className={styles.modalClose} onClick={closeModal}>{ICONS.x}</button>
+            <button className={styles.modalClose} onClick={closeModal} aria-label="Fermer"><X size={18} /></button>
             <div className={styles.modalIcon}>{MODAL_SLIDES[modalStep - 1].icon}</div>
             <h3>{MODAL_SLIDES[modalStep - 1].title}</h3>
             <p>{MODAL_SLIDES[modalStep - 1].text}</p>
@@ -631,7 +684,7 @@ function EntrainementsDashboard({ profile, onReset }) {
               ))}
             </div>
             <div className={styles.modalNav}>
-              <button className={styles.btnPasser} onClick={closeModal}>{ICONS.x} Passer</button>
+              <button className={styles.btnPasser} onClick={closeModal}><X size={14} /> Passer</button>
               {modalStep < MODAL_SLIDES.length
                 ? <button className={styles.btnSuivant} onClick={() => setModalStep(2)}>Suivant {ICONS.arrow}</button>
                 : <button className={styles.btnSuivant} onClick={closeModal}>Commencer {ICONS.play}</button>
@@ -647,10 +700,10 @@ function EntrainementsDashboard({ profile, onReset }) {
           <div className={styles.modalBoxCustom}>
             <div className={styles.modalHeader}>
               <div>
-                <h3 className={styles.modalTitle}>🎤 Poser une question spécifique</h3>
+                <h3 className={styles.modalTitle}><Mic size={18} className={styles.modalTitleIcon} /> Poser une question spécifique</h3>
                 <p className={styles.modalSubtitle}>Saisissez une question personnalisée ou choisissez une suggestion ci-dessous.</p>
               </div>
-              <button className={styles.modalClose} onClick={() => setShowAskModal(false)}>✕</button>
+              <button className={styles.modalClose} onClick={() => setShowAskModal(false)} aria-label="Fermer"><X size={18} /></button>
             </div>
             
             <form onSubmit={handleAskSubmit} className={styles.modalForm}>
@@ -703,17 +756,16 @@ function EntrainementsDashboard({ profile, onReset }) {
           <div className={styles.modalBoxCustom}>
             <div className={styles.modalHeader}>
               <div>
-                <h3 className={styles.modalTitle}>📚 Compléter ma librairie</h3>
+                <h3 className={styles.modalTitle}><BookOpen size={18} className={styles.modalTitleIcon} /> Compléter ma librairie</h3>
                 <p className={styles.modalSubtitle}>Sélectionnez une compétence ci-dessous pour lancer un entraînement ciblé.</p>
               </div>
-              <button className={styles.modalClose} onClick={() => setShowLibModal(false)}>✕</button>
+              <button className={styles.modalClose} onClick={() => setShowLibModal(false)} aria-label="Fermer"><X size={18} /></button>
             </div>
             
             <div className={styles.modalBodyScroll}>
               <div className={styles.libGrid}>
                 {COMPETENCES.map((c) => {
                   const prog = competencesProgress[c.id] || { stars: 0, sessions: 0, avgScore: 0, done: false };
-                  const starsStr = "⭐".repeat(prog.stars) + "☆".repeat(5 - prog.stars);
                   return (
                     <div
                       key={c.id}
@@ -724,16 +776,16 @@ function EntrainementsDashboard({ profile, onReset }) {
                       }}
                     >
                       <div className={styles.libItemHeader}>
-                        <span className={styles.libEmoji}>{c.emoji}</span>
+                        <span className={styles.libEmoji}>{c.icon}</span>
                         <div>
                           <strong>{c.label}</strong>
                           <span className={styles.libSub}>{c.sub}</span>
                         </div>
                       </div>
                       <div className={styles.libItemFooter}>
-                        <span className={styles.libStars}>{starsStr}</span>
+                        <span className={styles.libStars}>{renderStars(prog.stars)}</span>
                         {prog.done ? (
-                          <span className={styles.libBadgeDone}>✓ Terminée</span>
+                          <span className={styles.libBadgeDone}><Check size={12} strokeWidth={2.5} /> Terminée</span>
                         ) : (
                           <span className={styles.libBadgeTodo}>À travailler ({prog.avgScore}%)</span>
                         )}
@@ -751,7 +803,7 @@ function EntrainementsDashboard({ profile, onReset }) {
       <div className={styles.dashHeader}>
         <div className={styles.dashHeaderLeft}>
           <div className={styles.dashHeaderIcon}>
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M2 8h4M18 8h4M2 16h4M18 16h4M6 12h12"/></svg>
+            <Dumbbell size={24} strokeWidth={2} />
           </div>
           <div>
             <h1>Entraînements</h1>
@@ -761,7 +813,7 @@ function EntrainementsDashboard({ profile, onReset }) {
         
         <div className={styles.dashHeaderRight}>
           <div className={styles.streakBadgeHeader}>
-            <span>🔥</span>
+            <Flame size={16} className={styles.flameIcon} />
             <span>{streak} jour{streak > 1 ? "s" : ""}</span>
           </div>
           
@@ -793,7 +845,7 @@ function EntrainementsDashboard({ profile, onReset }) {
           {/* ENTRAÎNEMENT DU JOUR */}
           <div className={styles.jourCard}>
             <div className={styles.jourHeader}>
-              <div className={styles.jourIc}>⚡</div>
+              <div className={styles.jourIc}><Zap size={24} strokeWidth={2} /></div>
               <div className={styles.jourHeaderText}>
                 <h2>Entraînement du jour</h2>
                 <p>4 questions ciblées par ton coach IA</p>
@@ -804,7 +856,7 @@ function EntrainementsDashboard({ profile, onReset }) {
             </div>
             
             <div className={styles.jourMeta}>
-              ⏱ ~11 min · <span>{doneToday ? "4/4 faites" : activeTraining ? "0/4 faites" : "0/4 faites"}</span>
+              <Clock size={14} className={styles.metaClockIcon} /> ~11 min · <span>{doneToday ? "4/4 faites" : activeTraining ? "0/4 faites" : "0/4 faites"}</span>
             </div>
             
             <div className={styles.jourProgress}>
@@ -819,10 +871,10 @@ function EntrainementsDashboard({ profile, onReset }) {
           {/* RÉGULARITÉ */}
           <div className={styles.regulariteCard}>
             <div className={styles.regulariteHeader}>
-              <span className={styles.regulariteTitle}>🔥 Régularité</span>
+              <span className={styles.regulariteTitle}><Flame size={18} className={styles.flameIcon} /> Régularité</span>
               <div className={styles.regulariteBadges}>
                 <span className={styles.activeDaysText}>0 j actifs</span>
-                <span className={styles.streakBadge}>🔥 {streak}j</span>
+                <span className={styles.streakBadge}><Flame size={13} className={styles.flameIcon} /> {streak}j</span>
               </div>
             </div>
             <EvolutionChart sessions={finishedTraining} />
@@ -837,7 +889,7 @@ function EntrainementsDashboard({ profile, onReset }) {
           <div className={styles.radarCard}>
             <div className={styles.radarHeader}>
               <div className={styles.radarHeaderLeft}>
-                <span>✨</span> Ton profil de compétences
+                <Sparkles size={16} className={styles.sparkleIcon} /> Ton profil de compétences
               </div>
               <div className={styles.radarPct}>
                 <span>{averageScore}%</span>
@@ -868,16 +920,16 @@ function EntrainementsDashboard({ profile, onReset }) {
         {/* ACTIONS RAPIDES */}
         <div className={styles.actionsRow}>
           <button className={styles.actionBtn} onClick={() => setShowAskModal(true)}>
-            {ICONS.spark} Demander une question spécifique
+            <HelpCircle size={15} /> Demander une question spécifique
           </button>
           <button className={styles.actionBtn} onClick={() => setShowLibModal(true)}>
-            {ICONS.spark} Compléter ma librairie
+            <BookOpen size={15} /> Compléter ma librairie
           </button>
           <button className={styles.actionBtn} onClick={() => setShowModal(true)}>
-            {ICONS.spark} Revoir la visite guidée
+            <Compass size={15} /> Revoir la visite guidée
           </button>
           <button className={styles.actionBtn} onClick={onReset}>
-            {ICONS.spark} Régénérer ma bibliothèque
+            <RotateCcw size={15} /> Régénérer ma bibliothèque
           </button>
         </div>
 
@@ -890,19 +942,18 @@ function EntrainementsDashboard({ profile, onReset }) {
           <div className={styles.competencesGrid}>
             {COMPETENCES.map((c) => {
               const prog = competencesProgress[c.id] || { stars: 0, sessions: 0, avgScore: 0, done: false };
-              const starsStr = "⭐".repeat(prog.stars) + "☆".repeat(5 - prog.stars);
               return (
                 <div key={c.id} className={`${styles.competenceCard} ${prog.done ? styles.competenceDone : ""}`}>
                   <div className={styles.compHeader}>
-                    <span className={styles.compEmoji}>{c.emoji}</span>
+                    <span className={styles.compEmoji}>{c.icon}</span>
                     <div className={styles.compInfo}>
                       <div className={styles.compLabel}>
                         {c.label}
-                        {prog.done && <span className={styles.doneBadge}>✓ Terminée</span>}
+                        {prog.done && <span className={styles.doneBadge}><Check size={11} strokeWidth={2.5} /> Terminée</span>}
                       </div>
                       <div className={styles.compSub}>{c.sub}</div>
                     </div>
-                    <div className={styles.stars}>{starsStr}</div>
+                    <div className={styles.stars}>{renderStars(prog.stars)}</div>
                   </div>
                   <div className={styles.compFooter}>
                     <span>{c.q} questions</span>

@@ -111,6 +111,13 @@ export const authAPI = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
     }),
+
+  renvoyerConfirmation: (email) =>
+    request("/auth/renvoyer-confirmation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(typeof email === "string" ? { email } : email),
+    }),
 };
 
 // ── USER ─────────────────────────────────────────────────────

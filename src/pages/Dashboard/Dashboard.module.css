@@ -63,6 +63,80 @@
   margin-top: 3px;
 }
 
+/* ── EMAIL VERIFICATION BANNER ── */
+.emailBanner {
+  margin: 20px 36px 0;
+  background: linear-gradient(90deg, #eff6ff 0%, #f0fdf4 100%);
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid var(--blue-600);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+}
+
+.emailBannerContent {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.emailBannerIcon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.emailBannerContent strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--gray-900);
+  margin-bottom: 2px;
+}
+
+.emailBannerContent p {
+  font-size: 0.825rem;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.emailBannerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.bannerFeedback {
+  font-size: 0.8rem;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.bannerResendBtn {
+  padding: 8px 16px;
+  background: var(--blue-600);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.bannerResendBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.bannerResendBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .pageSub strong {
   color: var(--gray-700);
   font-weight: 600;

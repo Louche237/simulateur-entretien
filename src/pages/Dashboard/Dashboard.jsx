@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import { sessionAPI, userAPI } from "../../utils/api";
+import { authAPI, sessionAPI, userAPI } from "../../utils/api";
 import { getLocalSessions, getLocalStats } from "../../utils/localSessions";
 import styles from "./Dashboard.module.css";
 
@@ -149,6 +149,36 @@ export default function Dashboard() {
   const [user, setUser] = useState(getStoredUser());
   const [stats, setStats] = useState(() => ({ ...emptyStats, ...getLocalStats() }));
   const [sessions, setSessions] = useState(() => getLocalSessions().slice(0, 3));
+  const [bannerLoading, setBannerLoading] = useState(false);
+  const [bannerFeedback, setBannerFeedback] = useState("");
+  const [bannerCountdown, setBannerCountdown] = useState(0);
+
+  useEffect(() => {
+    if (bannerCountdown <= 0) return;
+    const timer = setInterval(() => {
+      setBannerCountdown((c) => c - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [bannerCountdown]);
+
+  const handleResendBanner = async () => {
+    if (!user?.email || bannerLoading || bannerCountdown > 0) return;
+    setBannerLoading(true);
+    setBannerFeedback("");
+    try {
+      const res = await authAPI.renvoyerConfirmation(user.email);
+      setBannerLoading(false);
+      if (res.success) {
+        setBannerFeedback("✓ E-mail envoyé !");
+        setBannerCountdown(60);
+      } else {
+        setBannerFeedback("⚠ " + (res.message || "Erreur"));
+      }
+    } catch {
+      setBannerLoading(false);
+      setBannerFeedback("⚠ Erreur de connexion");
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -241,6 +271,33 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
+
+        {user && user.emailConfirmed === false && (
+          <div className={styles.emailBanner}>
+            <div className={styles.emailBannerContent}>
+              <span className={styles.emailBannerIcon}>📬</span>
+              <div>
+                <strong>Votre adresse e-mail ({user.email}) n'est pas encore confirmée.</strong>
+                <p>Vérifiez votre boîte mail ou vos courriers indésirables pour activer pleinement votre compte.</p>
+              </div>
+            </div>
+            <div className={styles.emailBannerActions}>
+              {bannerFeedback && <span className={styles.bannerFeedback}>{bannerFeedback}</span>}
+              <button
+                type="button"
+                className={styles.bannerResendBtn}
+                onClick={handleResendBanner}
+                disabled={bannerLoading || bannerCountdown > 0}
+              >
+                {bannerLoading
+                  ? "Envoi..."
+                  : bannerCountdown > 0
+                  ? `Renvoyer (${bannerCountdown}s)`
+                  : "Renvoyer l'e-mail"}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className={styles.content}>
           {/* ── Stat Cards ── */}

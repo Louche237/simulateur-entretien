@@ -569,3 +569,132 @@
   color: var(--gray-500);
   margin: 0;
 }
+
+/* ÉCRAN DE CONFIRMATION D'INSCRIPTION */
+.verifyCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 4px 16px;
+  animation: fadeUp .25s ease;
+}
+
+.verifyIconWrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--blue-50);
+  border: 2px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--blue-500);
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+  animation: pulseIcon 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseIcon {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.22);
+  }
+}
+
+.verifyTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+
+.verifySub {
+  font-size: 14px;
+  color: var(--gray-700);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.emailBadge {
+  display: inline-block;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--blue-500);
+  font-size: 15px;
+  font-weight: 600;
+  word-break: break-all;
+  margin-bottom: 18px;
+}
+
+.verifyHint {
+  font-size: 13px;
+  color: var(--gray-500);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  max-width: 360px;
+}
+
+.verifyActions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.resendBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 11px 16px;
+  background: #ffffff;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 8px;
+  color: var(--gray-700);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.resendBtn:hover:not(:disabled) {
+  border-color: var(--blue-500);
+  color: var(--blue-500);
+  background: var(--blue-50);
+}
+
+.resendBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.resendAlertSuccess {
+  font-size: 13px;
+  color: #16a34a;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.resendAlertError {
+  font-size: 13px;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  width: 100%;
+}

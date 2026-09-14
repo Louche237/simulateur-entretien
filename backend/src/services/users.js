@@ -6,7 +6,8 @@ import { User, Session } from "../models/index.js";
 export const toPublicUser = (rawUser) => {
   if (!rawUser) return null;
 
-  const user = typeof rawUser.get === "function" ? rawUser.get({ plain: true }) : { ...rawUser };
+  const plain = typeof rawUser.get === "function" ? rawUser.get({ plain: true }) : rawUser;
+  const user = { ...plain };
   delete user.passwordHash;
   delete user.confirmationToken;
 
@@ -55,17 +56,24 @@ export const createUserRecord = async ({ prenom, nom, email, password, role }) =
     onboardingCompleted: false,
   });
 
+  created.confirmationToken = confirmationToken;
   return created;
 };
 
 export const confirmUserEmail = async (token) => {
-  if (!token) return null;
+  if (!token) return { status: "invalid" };
   const user = await User.findOne({ where: { confirmationToken: token } });
-  if (!user) return null;
+  if (!user) {
+    return { status: "not_found" };
+  }
+
+  if (user.emailConfirmed) {
+    return { status: "already_confirmed", user };
+  }
 
   const now = new Date();
   if (user.confirmationTokenExpiresAt && now > new Date(user.confirmationTokenExpiresAt)) {
-    return null;
+    return { status: "expired", user };
   }
 
   await user.update({
@@ -74,7 +82,31 @@ export const confirmUserEmail = async (token) => {
     confirmationTokenExpiresAt: null,
   });
 
-  return user;
+  return { status: "success", user };
+};
+
+export const regenerateConfirmationToken = async (email) => {
+  if (!email) return { status: "invalid" };
+  const user = await User.findOne({
+    where: { email: String(email).trim().toLowerCase() },
+  });
+  if (!user) {
+    return { status: "not_found" };
+  }
+
+  if (user.emailConfirmed) {
+    return { status: "already_confirmed", user };
+  }
+
+  const confirmationToken = crypto.randomBytes(32).toString("hex");
+  const confirmationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await user.update({
+    confirmationToken,
+    confirmationTokenExpiresAt,
+  });
+
+  return { status: "success", user, confirmationToken };
 };
 
 export const markOnboardingCompleted = async (userId) => {

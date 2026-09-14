@@ -7,7 +7,8 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "db:init": "node src/db/initDb.js",
-    "db:seed": "node src/db/initDb.js"
+    "db:seed": "node src/db/initDb.js",
+    "test:email": "node test_smtp.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

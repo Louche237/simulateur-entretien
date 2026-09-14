@@ -2,6 +2,7 @@ import app from "./app.js";
 import { config } from "./config.js";
 import { initializeDatabase } from "./db/initDb.js";
 import { ensureDb } from "./store.js";
+import { verifyEmailTransporter } from "./lib/email.js";
 
 // Maintenir ensureDb() pour la compatibilité
 ensureDb();
@@ -22,4 +23,5 @@ initializeDatabase({ seed: true, migrate: true })
 
 app.listen(config.port, () => {
   console.log(`Backend JobMentor prêt sur http://localhost:${config.port}`);
+  verifyEmailTransporter().catch(() => {});
 });

@@ -3,19 +3,30 @@ import { config } from "../config.js";
 
 let transporter = null;
 
-const getTransporter = () => {
+export const getTransporter = () => {
   if (transporter) return transporter;
 
-  if (!config.email.user || !config.email.pass) {
-    console.warn("[EMAIL] SMTP non configuré - mode simulation activé");
+  const isConfigured = Boolean(config.email.user && config.email.pass);
+
+  if (!isConfigured) {
+    console.warn("\n⚠️  [EMAIL] SMTP non configuré dans .env.local — Mode simulation activé.");
+    console.warn("ℹ️  Les liens de confirmation seront affichés directement dans ce terminal pour vos tests.\n");
+
     transporter = {
       sendMail: async (options) => {
-        console.log("[EMAIL] Simulation d'envoi:", {
-          to: options.to,
-          subject: options.subject,
-          preview: options.text?.substring(0, 100),
-        });
-        return { messageId: "simulated-" + Date.now(), simulated: true };
+        const linkMatch = options.text?.match(/https?:\/\/[^\s]+/i) || options.html?.match(/href="(https?:\/\/[^"]+)"/i);
+        const link = linkMatch ? (linkMatch[1] || linkMatch[0]) : null;
+
+        console.log("\n" + "═".repeat(70));
+        console.log("📨  [EMAIL SIMULATION] Envoi simulé avec succès :");
+        console.log(`   ➤ Destinataire : ${options.to}`);
+        console.log(`   ➤ Sujet        : ${options.subject}`);
+        if (link) {
+          console.log(`   ➤ Lien d'action: \x1b[36m${link}\x1b[0m`);
+        }
+        console.log("═".repeat(70) + "\n");
+
+        return { messageId: "simulated-" + Date.now(), simulated: true, link };
       },
     };
     return transporter;
@@ -29,143 +40,248 @@ const getTransporter = () => {
       user: config.email.user,
       pass: config.email.pass,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 
   return transporter;
 };
 
-export const sendWelcomeEmail = async ({ prenom, nom, email }) => {
-  const nomComplet = `${prenom} ${nom}`.trim();
+export const verifyEmailTransporter = async () => {
+  const isConfigured = Boolean(config.email.user && config.email.pass);
+  if (!isConfigured) {
+    return { ok: false, simulated: true, message: "Mode simulation actif (identifiants SMTP absents)" };
+  }
+
+  try {
+    const mail = getTransporter();
+    if (typeof mail.verify === "function") {
+      await mail.verify();
+      console.log(`✅ [EMAIL] Connexion SMTP établie avec succès (${config.email.host}:${config.email.port})`);
+      return { ok: true, simulated: false };
+    }
+    return { ok: true, simulated: false };
+  } catch (err) {
+    console.error(`❌ [EMAIL] Échec de connexion SMTP (${config.email.host}) :`, err.message);
+    return { ok: false, simulated: false, error: err.message };
+  }
+};
+
+export const sendConfirmationEmail = async ({ prenom, nom, email, confirmationToken, clientOrigin }) => {
+  const nomComplet = `${prenom || ""} ${nom || ""}`.trim() || "Candidat";
+  const salutation = prenom?.trim() || nomComplet;
+  const baseUrl = (clientOrigin || "http://localhost:5173").replace(/\/$/, "");
+  const confirmUrl = `${baseUrl}/confirm-email?token=${confirmationToken}`;
   const mail = getTransporter();
 
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: #0f1f3d; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Bienvenue sur JobMentor 🎉</h1>
-      </div>
-      <div style="background: white; padding: 32px; border: 1px solid #e5e7eb; border-top: none;">
-        <h2 style="color: #111827; font-size: 20px; margin: 0 0 16px;">Bonjour ${prenom || nomComplet},</h2>
-        <p style="color: #374151; line-height: 1.6; margin: 0 0 16px;">
-          Merci de vous être inscrit sur <strong>JobMentor</strong> ! Votre compte a bien été créé.
-        </p>
-        <div style="background: #eff6ff; border-radius: 8px; padding: 20px; margin: 24px 0;">
-          <h3 style="color: #0f1f3d; margin: 0 0 12px; font-size: 16px;">🚀 Pour commencer :</h3>
-          <ol style="color: #374151; margin: 0; padding-left: 20px; line-height: 1.8;">
-            <li>Connectez-vous à votre espace</li>
-            <li>Complétez votre profil dans la section Paramètres</li>
-            <li>Lancez votre première simulation d'entretien</li>
-            <li>Analysez vos performances et progressez !</li>
-          </ol>
-        </div>
-        <p style="color: #374151; line-height: 1.6; margin: 0 0 16px;">
-          Si vous avez des questions, n'hésitez pas à nous contacter.
-        </p>
-        <p style="color: #6b7280; font-size: 14px; margin: 0;">
-          À bientôt sur JobMentor,<br />
-          L'équipe JobMentor
-        </p>
-      </div>
-      <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 12px;">
-        © ${new Date().getFullYear()} JobMentor. Tous droits réservés.
-      </div>
-    </div>
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Confirmez votre adresse e-mail — JobMentor</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+        <tr>
+          <td align="center" style="padding: 40px 16px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 580px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04); border: 1px solid #e2e8f0;">
+              <!-- Header -->
+              <tr>
+                <td align="center" style="background: linear-gradient(135deg, #0f1f3d 0%, #1e3a8a 100%); padding: 36px 24px; text-align: center;">
+                  <div style="display: inline-block; background: rgba(255, 255, 255, 0.12); padding: 10px 20px; border-radius: 9999px; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <span style="color: #60a5fa; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase;">JobMentor</span>
+                  </div>
+                  <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Confirmez votre inscription</h1>
+                </td>
+              </tr>
+              <!-- Content -->
+              <tr>
+                <td style="padding: 36px 32px 28px 32px;">
+                  <p style="font-size: 17px; line-height: 1.6; margin: 0 0 16px 0; color: #0f172a;">
+                    Bonjour <strong>${salutation}</strong>,
+                  </p>
+                  <p style="font-size: 15px; line-height: 1.6; margin: 0 0 24px 0; color: #475569;">
+                    Merci d'avoir rejoint <strong>JobMentor</strong>, la plateforme d'entraînement aux entretiens d'embauche par intelligence artificielle.
+                  </p>
+                  <p style="font-size: 15px; line-height: 1.6; margin: 0 0 32px 0; color: #475569;">
+                    Pour valider votre compte et commencer vos simulations vocales et techniques en toute sécurité, veuillez confirmer votre adresse e-mail en cliquant sur le bouton ci-dessous :
+                  </p>
+                  
+                  <!-- Button CTA -->
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                      <td align="center" style="padding-bottom: 32px;">
+                        <a href="${confirmUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; padding: 14px 34px; border-radius: 10px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); text-align: center;">
+                          Confirmer mon adresse e-mail →
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <!-- Information Box -->
+                  <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 6px; padding: 14px 18px; margin-bottom: 28px;">
+                    <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">
+                      ⏰ <strong>Validité :</strong> Ce lien est actif pendant <strong>24 heures</strong>. Passé ce délai, vous pourrez demander un nouveau lien directement depuis l'application.
+                    </p>
+                  </div>
+
+                  <!-- Fallback Link -->
+                  <p style="font-size: 13px; line-height: 1.6; color: #94a3b8; margin: 0 0 8px 0;">
+                    Si le bouton ci-dessus ne fonctionne pas, copiez et collez l'URL suivante dans votre navigateur :
+                  </p>
+                  <p style="font-size: 12px; line-height: 1.5; color: #2563eb; word-break: break-all; margin: 0 0 28px 0; background-color: #f1f5f9; padding: 10px 14px; border-radius: 6px; font-family: monospace;">
+                    <a href="${confirmUrl}" target="_blank" style="color: #2563eb; text-decoration: underline;">${confirmUrl}</a>
+                  </p>
+
+                  <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 28px 0;" />
+
+                  <p style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin: 0;">
+                    Si vous n'êtes pas à l'origine de cette inscription sur JobMentor, vous pouvez ignorer cet e-mail en toute sécurité. Aucun compte actif ne sera créé sans validation.
+                  </p>
+                </td>
+              </tr>
+              <!-- Footer -->
+              <tr>
+                <td style="background-color: #f8fafc; padding: 20px 32px; text-align: center; border-top: 1px solid #e2e8f0;">
+                  <p style="font-size: 12px; color: #94a3b8; margin: 0 0 4px 0;">
+                    © ${new Date().getFullYear()} JobMentor. Tous droits réservés.
+                  </p>
+                  <p style="font-size: 11px; color: #cbd5e1; margin: 0;">
+                    Ce message automatique a été envoyé à ${email}.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  const text = `
+Bonjour ${salutation},
+
+Merci d'avoir rejoint JobMentor !
+
+Pour confirmer votre adresse e-mail et activer pleinement votre compte candidat, veuillez cliquer sur le lien suivant (ou le copier dans votre navigateur) :
+
+${confirmUrl}
+
+⏰ Ce lien de confirmation est valable pendant 24 heures.
+
+Si vous n'avez pas demandé à créer de compte sur JobMentor, ignorez simplement cet e-mail.
+
+À bientôt sur JobMentor,
+L'équipe JobMentor
+© ${new Date().getFullYear()} JobMentor
+  `.trim();
+
+  try {
+    const result = await mail.sendMail({
+      from: config.email.from,
+      to: email,
+      subject: "Confirmez votre adresse e-mail — JobMentor",
+      html,
+      text,
+    });
+    return { success: true, ...result };
+  } catch (err) {
+    console.error("[EMAIL] Erreur lors de l'envoi de l'e-mail de confirmation :", err.message);
+    return { success: false, error: err.message };
+  }
+};
+
+export const sendWelcomeEmail = async ({ prenom, nom, email }) => {
+  const nomComplet = `${prenom || ""} ${nom || ""}`.trim() || "Candidat";
+  const salutation = prenom?.trim() || nomComplet;
+  const mail = getTransporter();
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="utf-8">
+      <title>Bienvenue sur JobMentor 🎉</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td align="center" style="padding: 40px 16px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 580px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+              <tr>
+                <td align="center" style="background: linear-gradient(135deg, #0f1f3d 0%, #1e3a8a 100%); padding: 32px 24px; text-align: center;">
+                  <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Votre compte est vérifié ! 🎉</h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 32px;">
+                  <h2 style="color: #0f172a; font-size: 18px; margin: 0 0 16px;">Félicitations ${salutation},</h2>
+                  <p style="color: #475569; font-size: 15px; line-height: 1.6; margin: 0 0 20px;">
+                    Votre adresse e-mail a bien été confirmée. Vous pouvez désormais exploiter toute la puissance de <strong>JobMentor</strong>.
+                  </p>
+                  <div style="background-color: #eff6ff; border-radius: 10px; padding: 20px; margin: 24px 0; border: 1px solid #dbeafe;">
+                    <h3 style="color: #1e40af; margin: 0 0 12px; font-size: 15px;">🚀 Vos prochaines étapes recommandées :</h3>
+                    <ol style="color: #1e3a8a; margin: 0; padding-left: 20px; line-height: 1.8; font-size: 14px;">
+                      <li>Téléversez ou créez votre CV dans la section <strong>Analyse CV</strong></li>
+                      <li>Configurez votre première simulation d'entretien vocal personnalisé</li>
+                      <li>Consultez votre analyse IA pour corriger vos points faibles</li>
+                    </ol>
+                  </div>
+                  <p style="color: #64748b; font-size: 14px; margin: 0;">
+                    À bientôt sur JobMentor,<br />
+                    <strong>L'équipe JobMentor</strong>
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td style="background-color: #f8fafc; padding: 16px; text-align: center; border-top: 1px solid #e2e8f0;">
+                  <p style="font-size: 12px; color: #94a3b8; margin: 0;">
+                    © ${new Date().getFullYear()} JobMentor. Tous droits réservés.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
   `;
 
   const text = `
 Bienvenue sur JobMentor !
 
-Bonjour ${prenom || nomComplet},
+Bonjour ${salutation},
 
-Merci de vous être inscrit sur JobMentor ! Votre compte a bien été créé.
+Votre adresse e-mail a été confirmée avec succès. Vous avez désormais accès à l'ensemble des fonctionnalités de JobMentor :
+- Simulations d'entretiens vocaux avec feedback IA
+- Analyse et scoring automatique de CV
+- Suivi de votre progression et conseils sur-mesure
 
-Pour commencer :
-1. Connectez-vous à votre espace
-2. Complétez votre profil dans la section Paramètres
-3. Lancez votre première simulation d'entretien
-4. Analysez vos performances et progressez !
+Connectez-vous dès maintenant pour démarrer votre entraînement !
 
-Si vous avez des questions, n'hésitez pas à nous contacter.
-
-À bientôt sur JobMentor,
 L'équipe JobMentor
-
-© ${new Date().getFullYear()} JobMentor. Tous droits réservés.
+© ${new Date().getFullYear()} JobMentor
   `.trim();
 
   try {
     const result = await mail.sendMail({
       from: config.email.from,
       to: email,
-      subject: "Bienvenue sur JobMentor ! 🎉",
+      subject: "Bienvenue sur JobMentor ! Votre compte est activé 🎉",
       html,
       text,
     });
     return { success: true, ...result };
   } catch (err) {
-    console.error("[EMAIL] Erreur d'envoi:", err.message);
-    return { success: false, error: err.message };
-  }
-};
-
-export const sendConfirmationEmail = async ({ prenom, nom, email, confirmationToken, clientOrigin }) => {
-  const nomComplet = `${prenom} ${nom}`.trim();
-  const confirmUrl = `${clientOrigin}/confirm-email?token=${confirmationToken}`;
-  const mail = getTransporter();
-
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: #0f1f3d; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Confirmez votre email 📧</h1>
-      </div>
-      <div style="background: white; padding: 32px; border: 1px solid #e5e7eb; border-top: none;">
-        <h2 style="color: #111827; font-size: 20px; margin: 0 0 16px;">Bonjour ${prenom || nomComplet},</h2>
-        <p style="color: #374151; line-height: 1.6; margin: 0 0 16px;">
-          Merci de vous être inscrit sur <strong>JobMentor</strong> ! Veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous.
-        </p>
-        <div style="text-align: center; margin: 32px 0;">
-          <a href="${confirmUrl}" style="display: inline-block; background: #2563eb; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
-            Confirmer mon email
-          </a>
-        </div>
-        <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 16px;">
-          Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :<br />
-          <a href="${confirmUrl}" style="color: #2563eb; word-break: break-all;">${confirmUrl}</a>
-        </p>
-        <p style="color: #6b7280; font-size: 12px; margin: 0;">
-          Ce lien est valable 24 heures. Si vous n'avez pas demandé cette inscription, ignorez cet email.
-        </p>
-      </div>
-      <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 12px;">
-        © ${new Date().getFullYear()} JobMentor. Tous droits réservés.
-      </div>
-    </div>
-  `;
-
-  const text = `
-Confirmez votre email - JobMentor
-
-Bonjour ${prenom || nomComplet},
-
-Merci de vous être inscrit sur JobMentor ! Veuillez confirmer votre adresse email en cliquant sur le lien ci-dessous :
-
-${confirmUrl}
-
-Ce lien est valable 24 heures. Si vous n'avez pas demandé cette inscription, ignorez cet email.
-
-© ${new Date().getFullYear()} JobMentor. Tous droits réservés.
-  `.trim();
-
-  try {
-    const result = await mail.sendMail({
-      from: config.email.from,
-      to: email,
-      subject: "Confirmez votre email - JobMentor",
-      html,
-      text,
-    });
-    return { success: true, ...result };
-  } catch (err) {
-    console.error("[EMAIL] Erreur d'envoi:", err.message);
+    console.error("[EMAIL] Erreur d'envoi du message de bienvenue :", err.message);
     return { success: false, error: err.message };
   }
 };

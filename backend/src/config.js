@@ -1,7 +1,14 @@
 import dotenv from "dotenv";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const backendRoot = path.resolve(__dirname, "..");
 
 dotenv.config();
+dotenv.config({ path: path.join(backendRoot, ".env") });
 dotenv.config({ path: ".env.local", override: true });
+dotenv.config({ path: path.join(backendRoot, ".env.local"), override: true });
 
 const apiKey = process.env.OPENAI_API_KEY || process.env.GROQ_API_KEY || "";
 const isGroq = apiKey.startsWith("gsk_") || Boolean(process.env.GROQ_API_KEY);
